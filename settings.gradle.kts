@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RecipeRefactor"
 include(":app")
+include(":core")
