@@ -1,4 +1,4 @@
-package hu.tb.core.ui.theme
+package hu.tb.presentation.theme
 
 import androidx.compose.material3.Typography
 
