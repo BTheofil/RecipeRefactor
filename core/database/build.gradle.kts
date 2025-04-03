@@ -1,14 +1,15 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.devtools.ksp)
 }
 
 android {
     namespace = "hu.tb.database"
-    compileSdk = 35
+    compileSdk = libs.versions.compileSdkVersion.get().toInt()
 
     defaultConfig {
-        minSdk = 26
+        minSdk = libs.versions.minSdkVersion.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -33,11 +34,17 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    ksp(libs.room)
+    implementation(libs.room.runtime)
+    implementation(libs.room.coroutines)
+
+    implementation(libs.koin)
+    testImplementation(libs.koin.test.junit4)
 }

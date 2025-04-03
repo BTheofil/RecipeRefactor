@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "hu.tb.reciperefactor"
-    compileSdk = 35
+    compileSdk = libs.versions.compileSdkVersion.get().toInt()
 
     defaultConfig {
         applicationId = "hu.tb.reciperefactor"
-        minSdk = 26
-        targetSdk = 35
+        minSdk = libs.versions.minSdkVersion.get().toInt()
+        targetSdk = libs.versions.targetSdkVersion.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -56,6 +56,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.koin)
 
     implementation(project(":core:presentation"))
     implementation(project(":core:database"))
