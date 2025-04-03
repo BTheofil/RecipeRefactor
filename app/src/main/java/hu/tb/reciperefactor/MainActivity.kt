@@ -15,7 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import hu.tb.core.ui.theme.AppTheme
+import hu.tb.database.Database
+import hu.tb.presentation.theme.AppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,5 +44,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.size(200.dp)
             .background(MaterialTheme.colorScheme.primary)
-    ) {  }
+    ) {
+        Database()
+    }
 }
