@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface ShoppingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(entity: ShoppingItemEntity)
+    suspend fun insert(entity: ShoppingItemEntity)
 
     @Delete
     fun delete(entity: ShoppingItemEntity)

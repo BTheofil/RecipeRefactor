@@ -13,7 +13,10 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/core/database" />
+            <option value="$PROJECT_DIR$/core/domain" />
             <option value="$PROJECT_DIR$/core/presentation" />
+            <option value="$PROJECT_DIR$/shopping" />
+            <option value="$PROJECT_DIR$/shopping/presentation" />
           </set>
         </option>
       </GradleProjectSettings>

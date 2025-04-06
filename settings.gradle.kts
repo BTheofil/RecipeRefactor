@@ -20,6 +20,9 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "RecipeRefactor"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":core:presentation")
 include(":core:database")
+include(":shopping:presentation")
+include(":core:domain")
