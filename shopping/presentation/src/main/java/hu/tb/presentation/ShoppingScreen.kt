@@ -1,12 +1,19 @@
 package hu.tb.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Create
@@ -17,8 +24,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -30,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -120,41 +126,18 @@ private fun ShoppingScreen(
             items(
                 items = items
             ) { item ->
-                ListItem(
+                ItemContainer(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
                         .alpha(if (item.isChecked) 0.7f else 1f),
-                    headlineContent = {
-                        Text(
-                            text = item.name,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    trailingContent = {
-                        Checkbox(
-                            checked = item.isChecked,
-                            onCheckedChange = { isChecked ->
-                                onAction(
-                                    ShoppingAction.OnItemCheckChange(
-                                        item,
-                                        isChecked
-                                    )
-                                )
-                            },
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = MaterialTheme.colorScheme.primary,
-                                checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-                                uncheckedColor = MaterialTheme.colorScheme.primary
+                    item = item,
+                    onCheckClick = { isChecked ->
+                        onAction(
+                            ShoppingAction.OnItemCheckChange(
+                                item,
+                                isChecked
                             )
                         )
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
+                    }
                 )
             }
         }
@@ -172,6 +155,46 @@ private fun ShoppingScreen(
                 onDismissRequest = { isDeleteDialogVisible = false }
             )
         }
+    }
+}
+
+@Composable
+private fun ItemContainer(
+    modifier: Modifier,
+    item: ShoppingItem,
+    onCheckClick: (Boolean) -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(6.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            modifier = Modifier
+                .weight(1f),
+            text = item.name,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Checkbox(
+            checked = item.isChecked,
+            onCheckedChange = onCheckClick,
+            colors = CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.primary,
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                uncheckedColor = MaterialTheme.colorScheme.primary
+            )
+        )
     }
 }
 
