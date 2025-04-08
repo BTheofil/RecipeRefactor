@@ -6,7 +6,7 @@ interface ShoppingRepository {
 
     suspend fun saveItem(item: ShoppingItem)
 
-    fun deleteItem(item: ShoppingItem)
+    suspend fun deleteItem(item: ShoppingItem)
 
     fun getAllItem(): Flow<List<ShoppingItem>>
 }

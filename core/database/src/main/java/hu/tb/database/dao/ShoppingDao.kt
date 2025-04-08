@@ -15,7 +15,7 @@ interface ShoppingDao {
     suspend fun insert(entity: ShoppingItemEntity)
 
     @Delete
-    fun delete(entity: ShoppingItemEntity)
+    suspend fun delete(entity: ShoppingItemEntity)
 
     @Query("SELECT * FROM shoppingitementity")
     fun getAll(): Flow<List<ShoppingItemEntity>>

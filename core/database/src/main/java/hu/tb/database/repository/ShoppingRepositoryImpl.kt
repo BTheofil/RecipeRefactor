@@ -15,7 +15,7 @@ class ShoppingRepositoryImpl(
     override suspend fun saveItem(item: ShoppingItem) =
         dao.insert(item.toEntity())
 
-    override fun deleteItem(item: ShoppingItem) =
+    override suspend fun deleteItem(item: ShoppingItem) =
         dao.delete(item.toEntity())
 
     override fun getAllItem(): Flow<List<ShoppingItem>> =

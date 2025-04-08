@@ -28,10 +28,18 @@ class ShoppingViewModel(
 
     fun onAction(action: ShoppingAction) {
         when (action) {
-            ShoppingAction.OnClearButtonClick -> TODO()
+            ShoppingAction.OnClearButtonClick -> deleteAllItems()
             is ShoppingAction.OnItemCheckChange -> changeItemCheck(action.item, action.change)
             is ShoppingAction.OnCreateDialogSaveButtonClick -> saveNewItem(action.newItem)
 
+        }
+    }
+
+    private fun deleteAllItems() {
+        viewModelScope.launch {
+            items.value.forEach { item ->
+                repository.deleteItem(item)
+            }
         }
     }
 
