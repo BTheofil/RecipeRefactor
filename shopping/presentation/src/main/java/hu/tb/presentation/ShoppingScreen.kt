@@ -208,7 +208,7 @@ private fun ShoppingScreen(
         }
 
         if (isCreateDialogVisible) {
-            CreateTodoDialog(
+            CreateShoppingItemDialog(
                 onSaveButton = {
                     onAction(
                         ShoppingAction.OnCreateDialogSaveButtonClick(
@@ -230,7 +230,7 @@ private fun ShoppingScreen(
         }
 
         if (isSingleDeleteDialogVisible) {
-            DeleteSingleItemsDialog(
+            DeleteSingleItemDialog(
                 onDeleteButton = {
                     selectedItem?.let { onAction(ShoppingAction.OnDeleteSingleButtonClick(it)) }
                     selectedItem = null
@@ -298,7 +298,7 @@ private fun ItemContainer(
 }
 
 @Composable
-private fun CreateTodoDialog(
+private fun CreateShoppingItemDialog(
     onSaveButton: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -358,7 +358,7 @@ private fun ClearItemsDialog(
 }
 
 @Composable
-private fun DeleteSingleItemsDialog(
+private fun DeleteSingleItemDialog(
     onDeleteButton: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -388,7 +388,7 @@ private fun DeleteSingleItemsDialog(
 private fun CreateTodoDialogPreview() {
     AppTheme {
         Column {
-            CreateTodoDialog(
+            CreateShoppingItemDialog(
                 onDismissRequest = {},
                 onSaveButton = {}
             )
