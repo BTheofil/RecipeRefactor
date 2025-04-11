@@ -13,14 +13,19 @@ class ShoppingViewModel(
     private val repository: ShoppingRepository
 ) : ViewModel() {
 
-    private val _items = MutableStateFlow(emptyList<ShoppingItem>())
-    val items = _items.asStateFlow()
+    private val _state = MutableStateFlow(ShoppingState())
+    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
             repository.getAllItem().collect { repoItems ->
-                _items.update {
-                    repoItems
+                val unchecked = repoItems.filter { it.isChecked == false }
+                val checked = repoItems.filter { it.isChecked == true }
+                _state.update {
+                    ShoppingState(
+                        uncheckedItems = unchecked,
+                        checkedItems = checked
+                    )
                 }
             }
         }
@@ -29,39 +34,30 @@ class ShoppingViewModel(
     fun onAction(action: ShoppingAction) {
         when (action) {
             ShoppingAction.OnClearButtonClick -> deleteAllItems()
-            is ShoppingAction.OnItemCheckChange -> changeItemCheck(action.item, action.change)
-            is ShoppingAction.OnCreateDialogSaveButtonClick -> saveNewItem(action.newItem)
-
+            is ShoppingAction.OnItemCheckChange -> storeItem(action.item)
+            is ShoppingAction.OnCreateDialogSaveButtonClick -> storeItem(action.newItem)
+            is ShoppingAction.OnEditItemChange -> storeItem(action.item)
+            is ShoppingAction.OnDeleteSingleButtonClick -> deleteItem(action.item)
         }
     }
 
-    private fun deleteAllItems() {
-        viewModelScope.launch {
-            items.value.forEach { item ->
-                repository.deleteItem(item)
-            }
+    private fun deleteAllItems() = viewModelScope.launch {
+        state.value.checkedItems.forEach { item ->
+            repository.deleteItem(item)
+        }
+        state.value.uncheckedItems.forEach { item ->
+            repository.deleteItem(item)
         }
     }
 
-    private fun changeItemCheck(item: ShoppingItem, change: Boolean) {
-        viewModelScope.launch {
-            repository.saveItem(
-                ShoppingItem(
-                    id = item.id,
-                    name = item.name,
-                    isChecked = change
-                )
-            )
-        }
+
+    private fun storeItem(item: ShoppingItem) = viewModelScope.launch {
+        repository.saveItem(
+            item
+        )
     }
 
-    private fun saveNewItem(newItem: String) {
-        viewModelScope.launch {
-            repository.saveItem(
-                ShoppingItem(
-                    name = newItem
-                )
-            )
-        }
+    private fun deleteItem(item: ShoppingItem) = viewModelScope.launch {
+        repository.deleteItem(item)
     }
 }

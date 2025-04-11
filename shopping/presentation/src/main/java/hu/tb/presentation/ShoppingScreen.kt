@@ -1,6 +1,9 @@
 package hu.tb.presentation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Create
@@ -22,6 +26,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,8 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,15 +59,15 @@ fun ShoppingScreen(
     viewModel: ShoppingViewModel = koinViewModel()
 ) {
     ShoppingScreen(
-        items = viewModel.items.collectAsStateWithLifecycle().value,
+        state = viewModel.state.collectAsStateWithLifecycle().value,
         onAction = viewModel::onAction
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ShoppingScreen(
-    items: List<ShoppingItem>,
+    state: ShoppingState,
     onAction: (ShoppingAction) -> Unit
 ) {
     var isCreateDialogVisible by remember {
@@ -73,7 +78,25 @@ private fun ShoppingScreen(
         mutableStateOf(false)
     }
 
+    var isSingleDeleteDialogVisible by remember {
+        mutableStateOf(false)
+    }
+
+    var selectedItem by remember {
+        mutableStateOf<ShoppingItem?>(null)
+    }
+
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
+        modifier = Modifier
+            .clickable(
+                onClick = {
+                    focusManager.clearFocus()
+                },
+                interactionSource = null,
+                indication = null
+            ),
         topBar = {
             TopAppBar(
                 title = {
@@ -124,27 +147,95 @@ private fun ShoppingScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(
-                items = items
+                items = state.uncheckedItems,
+                key = { it -> it.id!! }
             ) { item ->
                 ItemContainer(
                     modifier = Modifier
-                        .alpha(if (item.isChecked) 0.7f else 1f),
+                        .animateItem()
+                        .alpha(if (item.isChecked) 0.7f else 1f)
+                        .combinedClickable(
+                            onClick = {},
+                            onLongClick = {
+                                isSingleDeleteDialogVisible = true
+                                selectedItem = item
+                            },
+                            onLongClickLabel = "appear single delete dialog",
+                            interactionSource = null,
+                            indication = null
+                        ),
                     item = item,
+                    onTextChange = { newText ->
+                        onAction(
+                            ShoppingAction.OnEditItemChange(
+                                item.copy(name = newText)
+                            )
+                        )
+                    },
                     onCheckClick = { isChecked ->
                         onAction(
                             ShoppingAction.OnItemCheckChange(
-                                item,
-                                isChecked
+                                item.copy(isChecked = isChecked)
                             )
                         )
                     }
                 )
             }
+            if (state.checkedItems.isNotEmpty()) {
+                item {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                items(
+                    items = state.checkedItems,
+                    key = { it -> it.id!! }
+                ) { item ->
+                    ItemContainer(
+                        modifier = Modifier
+                            .animateItem()
+                            .alpha(if (item.isChecked) 0.7f else 1f)
+                            .combinedClickable(
+                                onClick = {},
+                                onLongClick = {
+                                    isSingleDeleteDialogVisible = true
+                                    selectedItem = item
+                                },
+                                onLongClickLabel = "appear single delete dialog",
+                                interactionSource = null,
+                                indication = null
+                            ),
+                        item = item,
+                        onTextChange = { newText ->
+                            onAction(
+                                ShoppingAction.OnEditItemChange(
+                                    item.copy(name = newText)
+                                )
+                            )
+                        },
+                        onCheckClick = { isChecked ->
+                            onAction(
+                                ShoppingAction.OnItemCheckChange(
+                                    item.copy(isChecked = isChecked)
+                                )
+                            )
+                        }
+                    )
+                }
+            }
         }
 
         if (isCreateDialogVisible) {
             CreateTodoDialog(
-                onSaveButton = { onAction(ShoppingAction.OnCreateDialogSaveButtonClick(it)) },
+                onSaveButton = {
+                    onAction(
+                        ShoppingAction.OnCreateDialogSaveButtonClick(
+                            ShoppingItem(
+                                name = it
+                            )
+                        )
+                    )
+                },
                 onDismissRequest = { isCreateDialogVisible = false }
             )
         }
@@ -155,6 +246,20 @@ private fun ShoppingScreen(
                 onDismissRequest = { isDeleteDialogVisible = false }
             )
         }
+
+        if (isSingleDeleteDialogVisible) {
+            DeleteSingleItemsDialog(
+                onDeleteButton = {
+                    selectedItem?.let { onAction(ShoppingAction.OnDeleteSingleButtonClick(it)) }
+                    selectedItem = null
+                    isSingleDeleteDialogVisible = false
+                },
+                onDismissRequest = {
+                    isSingleDeleteDialogVisible = false
+                    selectedItem = null
+                }
+            )
+        }
     }
 }
 
@@ -162,8 +267,13 @@ private fun ShoppingScreen(
 private fun ItemContainer(
     modifier: Modifier,
     item: ShoppingItem,
+    onTextChange: (String) -> Unit,
     onCheckClick: (Boolean) -> Unit
 ) {
+    var currentText by remember {
+        mutableStateOf(item.name)
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth(),
@@ -176,15 +286,21 @@ private fun ItemContainer(
                 .background(MaterialTheme.colorScheme.primary)
         )
         Spacer(Modifier.width(8.dp))
-        Text(
+        BasicTextField(
             modifier = Modifier
                 .weight(1f),
-            text = item.name,
+            value = currentText,
+            onValueChange = {
+                currentText = it
+                onTextChange(currentText)
+            },
+            textStyle = MaterialTheme.typography.bodyLarge
+                .copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None
+                ),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary
+            enabled = !item.isChecked
         )
         Checkbox(
             checked = item.isChecked,
@@ -258,6 +374,32 @@ private fun ClearItemsDialog(
     )
 }
 
+@Composable
+private fun DeleteSingleItemsDialog(
+    onDeleteButton: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    Dialog(
+        icon = Icons.Outlined.Delete,
+        title = "Delete item",
+        content = {
+            Text(
+                text = "This action will permanently delete the item.\n" +
+                        "Are you sure you want to proceed?",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        positiveTitleButton = "Delete",
+        negativeTitleButton = "Cancel",
+        onPositiveButton = {
+            onDeleteButton()
+            onDismissRequest()
+        },
+        onDismissRequest = onDismissRequest
+    )
+}
+
 @Preview
 @Composable
 private fun CreateTodoDialogPreview() {
@@ -285,18 +427,29 @@ private fun ClearItemsDialogPreview() {
 @Preview
 @Composable
 private fun ShoppingScreenPreview() {
-    val mockList = listOf<ShoppingItem>(
+    val mockList1 = listOf<ShoppingItem>(
         ShoppingItem(
             1, "test", false
         ),
         ShoppingItem(
-            2, "test", true
+            2, "test", false
+        )
+    )
+    val mockList2 = listOf<ShoppingItem>(
+        ShoppingItem(
+            3, "test", true
+        ),
+        ShoppingItem(
+            4, "test", true
         )
     )
 
     AppTheme {
         ShoppingScreen(
-            items = mockList,
+            state = ShoppingState(
+                uncheckedItems = mockList1,
+                checkedItems = mockList2
+            ),
             onAction = {}
         )
     }
