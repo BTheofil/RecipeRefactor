@@ -27,7 +27,7 @@ import androidx.compose.ui.window.Dialog
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
-fun Dialog(
+fun SimpleDialog(
     icon: ImageVector? = null,
     title: String,
     content: @Composable () -> Unit,
@@ -99,7 +99,7 @@ fun Dialog(
 @Composable
 private fun DialogPreview() {
     AppTheme {
-        Dialog(
+        SimpleDialog(
             icon = Icons.Default.Create,
             title = "New item",
             content = {

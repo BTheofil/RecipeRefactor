@@ -50,7 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.domain.ShoppingItem
-import hu.tb.presentation.components.Dialog
+import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -148,22 +148,11 @@ private fun ShoppingScreen(
         ) {
             items(
                 items = state.uncheckedItems,
-                key = { it -> it.id!! }
+                key = { it -> it.id ?: it.hashCode() }
             ) { item ->
                 ItemContainer(
                     modifier = Modifier
-                        .animateItem()
-                        .alpha(if (item.isChecked) 0.7f else 1f)
-                        .combinedClickable(
-                            onClick = {},
-                            onLongClick = {
-                                isSingleDeleteDialogVisible = true
-                                selectedItem = item
-                            },
-                            onLongClickLabel = "appear single delete dialog",
-                            interactionSource = null,
-                            indication = null
-                        ),
+                        .animateItem(),
                     item = item,
                     onTextChange = { newText ->
                         onAction(
@@ -189,12 +178,11 @@ private fun ShoppingScreen(
                 }
                 items(
                     items = state.checkedItems,
-                    key = { it -> it.id!! }
+                    key = { it -> it.id ?: it.hashCode() }
                 ) { item ->
                     ItemContainer(
                         modifier = Modifier
                             .animateItem()
-                            .alpha(if (item.isChecked) 0.7f else 1f)
                             .combinedClickable(
                                 onClick = {},
                                 onLongClick = {
@@ -206,13 +194,7 @@ private fun ShoppingScreen(
                                 indication = null
                             ),
                         item = item,
-                        onTextChange = { newText ->
-                            onAction(
-                                ShoppingAction.OnEditItemChange(
-                                    item.copy(name = newText)
-                                )
-                            )
-                        },
+                        onTextChange = {},
                         onCheckClick = { isChecked ->
                             onAction(
                                 ShoppingAction.OnItemCheckChange(
@@ -270,13 +252,14 @@ private fun ItemContainer(
     onTextChange: (String) -> Unit,
     onCheckClick: (Boolean) -> Unit
 ) {
-    var currentText by remember {
+    var currentText by remember((item.name)) {
         mutableStateOf(item.name)
     }
 
     Row(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .alpha(if (item.isChecked) 0.7f else 1f),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -323,7 +306,7 @@ private fun CreateTodoDialog(
         mutableStateOf("")
     }
 
-    Dialog(
+    SimpleDialog(
         icon = Icons.Outlined.Create,
         title = "Create new item",
         content = {
@@ -353,7 +336,7 @@ private fun ClearItemsDialog(
     onDeleteButton: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    Dialog(
+    SimpleDialog(
         icon = Icons.Outlined.Delete,
         title = "Clear items",
         content = {
@@ -379,7 +362,7 @@ private fun DeleteSingleItemsDialog(
     onDeleteButton: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    Dialog(
+    SimpleDialog(
         icon = Icons.Outlined.Delete,
         title = "Delete item",
         content = {
