@@ -10,10 +10,10 @@ activityCompose = "1.10.1"
 composeBom = "2025.03.01"
 jetbrainsKotlinJvm = "2.0.21"
 appcompat = "1.7.0"
-material = "1.12.0"
 roomVersion = "2.6.1"
 kspVersion = "2.0.21-1.0.27"
 koinVersion = "4.0.4"
+coroutines = "1.8.0"
 
 #Project settings
 minSdkVersion = "26"
@@ -36,12 +36,13 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 room = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
 room-coroutines = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVersion" }
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koinVersion" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinVersion" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
