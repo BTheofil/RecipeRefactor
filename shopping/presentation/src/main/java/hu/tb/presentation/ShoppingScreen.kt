@@ -66,7 +66,7 @@ fun ShoppingScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-private fun ShoppingScreen(
+fun ShoppingScreen(
     state: ShoppingState,
     onAction: (ShoppingAction) -> Unit
 ) {
@@ -132,7 +132,7 @@ private fun ShoppingScreen(
                 Icon(
                     imageVector = Icons.Outlined.Add,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    contentDescription = "add icon"
+                    contentDescription = "FAB add icon"
                 )
             }
         },
