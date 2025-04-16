@@ -2,11 +2,16 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
     namespace = "hu.tb.database"
     compileSdk = libs.versions.compileSdkVersion.get().toInt()
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 
     defaultConfig {
         minSdk = libs.versions.minSdkVersion.get().toInt()

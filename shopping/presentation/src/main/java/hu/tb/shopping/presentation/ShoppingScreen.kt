@@ -1,4 +1,4 @@
-package hu.tb.presentation
+package hu.tb.shopping.presentation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

@@ -11,6 +11,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.shopping.presentation.ShoppingAction
+import hu.tb.shopping.presentation.ShoppingScreen
+import hu.tb.shopping.presentation.ShoppingState
 import org.junit.Rule
 import org.junit.Test
 
@@ -28,13 +31,14 @@ class ShoppingScreenTest {
                 ShoppingScreen(
                     state = mockState,
                     onAction = {
-                        when(it){
+                        when (it) {
                             ShoppingAction.OnClearButtonClick -> {}
                             is ShoppingAction.OnCreateDialogSaveButtonClick -> {
                                 mockState = mockState.copy(
                                     uncheckedItems = listOf(it.newItem)
                                 )
                             }
+
                             is ShoppingAction.OnDeleteSingleButtonClick -> {}
                             is ShoppingAction.OnEditItemChange -> {}
                             is ShoppingAction.OnItemCheckChange -> {}

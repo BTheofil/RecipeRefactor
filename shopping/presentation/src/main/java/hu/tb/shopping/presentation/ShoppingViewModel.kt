@@ -1,4 +1,4 @@
-package hu.tb.presentation
+package hu.tb.shopping.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
