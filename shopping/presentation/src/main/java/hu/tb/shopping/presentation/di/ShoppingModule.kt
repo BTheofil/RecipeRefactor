@@ -1,6 +1,6 @@
-package hu.tb.presentation.di
+package hu.tb.shopping.presentation.di
 
-import hu.tb.presentation.ShoppingViewModel
+import hu.tb.shopping.presentation.ShoppingViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 

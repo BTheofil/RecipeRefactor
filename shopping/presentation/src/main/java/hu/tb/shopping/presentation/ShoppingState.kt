@@ -1,4 +1,4 @@
-package hu.tb.presentation
+package hu.tb.shopping.presentation
 
 import hu.tb.domain.ShoppingItem
 
