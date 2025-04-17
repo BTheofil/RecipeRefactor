@@ -49,7 +49,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import hu.tb.domain.ShoppingItem
+import hu.tb.core.domain.shopping.ShoppingItem
 import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel

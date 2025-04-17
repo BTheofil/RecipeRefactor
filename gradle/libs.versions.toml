@@ -13,7 +13,10 @@ appcompat = "1.7.0"
 roomVersion = "2.7.0"
 kspVersion = "2.0.21-1.0.27"
 koinVersion = "4.0.4"
-coroutines = "1.8.0"
+coroutines = "1.10.1"
+ktorVersion = "3.1.2"
+navigationVersion = "2.8.9"
+kotlinxSerializationJson = "1.8.0"
 
 #Project settings
 minSdkVersion = "26"
@@ -35,6 +38,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 room = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
@@ -43,6 +47,12 @@ koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVer
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koinVersion" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinVersion" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
+ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVersion"}
+ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorVersion"}
+ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorVersion"}
+ktor-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorVersion"}
+ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorVersion"}
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

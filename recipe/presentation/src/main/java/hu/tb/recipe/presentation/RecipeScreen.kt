@@ -17,11 +17,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.presentation.theme.AppTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RecipeScreen() {
-    
+fun RecipeScreen(
+    viewModel: RecipeViewModel = koinViewModel()
+) {
+    RecipeScreen(
+        state = viewModel.state.collectAsStateWithLifecycle().value,
+        onAction = viewModel::onAction
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,9 +53,9 @@ fun RecipeScreen(
             inputField = {
                 SearchBarDefaults.InputField(
                     query = state.searchField,
-                    onQueryChange = { RecipeAction.OnSearchTextChange(it) },
+                    onQueryChange = { onAction(RecipeAction.OnSearchTextChange(it)) },
                     onSearch = {
-                        RecipeAction.OnSearch(it)
+                        onAction(RecipeAction.OnSearch(it))
                         isSearchExpanded = false
                     },
                     onExpandedChange = { isSearchExpanded = it },

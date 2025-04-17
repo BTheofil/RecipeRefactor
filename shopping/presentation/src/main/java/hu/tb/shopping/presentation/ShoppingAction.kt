@@ -1,6 +1,6 @@
 package hu.tb.shopping.presentation
 
-import hu.tb.domain.ShoppingItem
+import hu.tb.core.domain.shopping.ShoppingItem
 
 sealed class ShoppingAction {
     data class OnItemCheckChange(val item: ShoppingItem): ShoppingAction()

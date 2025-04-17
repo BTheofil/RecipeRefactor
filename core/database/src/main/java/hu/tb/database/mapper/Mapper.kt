@@ -1,7 +1,7 @@
 package hu.tb.database.mapper
 
 import hu.tb.database.entity.ShoppingItemEntity
-import hu.tb.domain.ShoppingItem
+import hu.tb.core.domain.shopping.ShoppingItem
 
 fun ShoppingItemEntity.toDomain(): ShoppingItem =
     ShoppingItem(

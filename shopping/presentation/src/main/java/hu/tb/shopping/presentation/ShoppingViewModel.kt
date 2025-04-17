@@ -2,8 +2,8 @@ package hu.tb.shopping.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import hu.tb.domain.ShoppingItem
-import hu.tb.domain.ShoppingRepository
+import hu.tb.core.domain.shopping.ShoppingItem
+import hu.tb.core.domain.shopping.ShoppingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
