@@ -80,6 +80,6 @@ data class MealDto(
         Pair(strIngredient18, strMeasure18),
         Pair(strIngredient19, strMeasure19),
         Pair(strIngredient20, strMeasure20)
-    )
+    ).filter { (ingredient, _) -> ingredient.isNotBlank() }
 
 }
