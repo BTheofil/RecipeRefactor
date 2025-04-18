@@ -3,7 +3,12 @@ package hu.tb.core.data.network
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Meal(
+data class MealResponse(
+    val meals: List<MealDto>
+)
+
+@Serializable
+data class MealDto(
     val idMeal: String,
     val strArea: String,
     val strCategory: String,
@@ -51,6 +56,30 @@ data class Meal(
     val strMeasure8: String,
     val strMeasure9: String,
     val strSource: String,
-    val strTags: String,
+    val strTags: String?,
     val strYoutube: String
-)
+) {
+    fun pairIngredientsWithMeasure() = listOf(
+        Pair(strIngredient1, strMeasure1),
+        Pair(strIngredient2, strMeasure2),
+        Pair(strIngredient3, strMeasure3),
+        Pair(strIngredient4, strMeasure4),
+        Pair(strIngredient5, strMeasure5),
+        Pair(strIngredient6, strMeasure6),
+        Pair(strIngredient7, strMeasure7),
+        Pair(strIngredient8, strMeasure8),
+        Pair(strIngredient9, strMeasure9),
+        Pair(strIngredient10, strMeasure10),
+        Pair(strIngredient11, strMeasure11),
+        Pair(strIngredient12, strMeasure12),
+        Pair(strIngredient13, strMeasure13),
+        Pair(strIngredient14, strMeasure14),
+        Pair(strIngredient15, strMeasure15),
+        Pair(strIngredient16, strMeasure16),
+        Pair(strIngredient17, strMeasure17),
+        Pair(strIngredient18, strMeasure18),
+        Pair(strIngredient19, strMeasure19),
+        Pair(strIngredient20, strMeasure20)
+    )
+
+}
