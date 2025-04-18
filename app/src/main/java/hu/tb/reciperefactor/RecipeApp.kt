@@ -1,7 +1,9 @@
 package hu.tb.reciperefactor
 
 import android.app.Application
+import hu.tb.core.data.di.dataModule
 import hu.tb.database.di.databaseModule
+import hu.tb.recipe.presentation.di.recipeModule
 import hu.tb.shopping.presentation.di.shoppingModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -16,8 +18,10 @@ class RecipeApp : Application() {
             androidLogger()
             androidContext(this@RecipeApp)
             modules(
+                dataModule,
                 databaseModule,
-                shoppingModule
+                shoppingModule,
+                recipeModule,
             )
         }
     }

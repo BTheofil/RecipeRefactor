@@ -1,6 +1,6 @@
 package hu.tb.shopping.presentation
 
-import hu.tb.domain.ShoppingItem
+import hu.tb.core.domain.shopping.ShoppingItem
 
 data class ShoppingState(
     val uncheckedItems: List<ShoppingItem> = emptyList(),

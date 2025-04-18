@@ -3,8 +3,8 @@ package hu.tb.database.repository
 import hu.tb.database.dao.ShoppingDao
 import hu.tb.database.mapper.toDomain
 import hu.tb.database.mapper.toEntity
-import hu.tb.domain.ShoppingItem
-import hu.tb.domain.ShoppingRepository
+import hu.tb.core.domain.shopping.ShoppingItem
+import hu.tb.core.domain.shopping.ShoppingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

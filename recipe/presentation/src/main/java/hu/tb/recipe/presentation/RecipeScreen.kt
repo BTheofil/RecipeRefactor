@@ -1,8 +1,10 @@
 package hu.tb.recipe.presentation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,11 +19,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.presentation.theme.AppTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RecipeScreen() {
-    
+fun RecipeScreen(
+    viewModel: RecipeViewModel = koinViewModel()
+) {
+    RecipeScreen(
+        state = viewModel.state.collectAsStateWithLifecycle().value,
+        onAction = viewModel::onAction
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,9 +55,9 @@ fun RecipeScreen(
             inputField = {
                 SearchBarDefaults.InputField(
                     query = state.searchField,
-                    onQueryChange = { RecipeAction.OnSearchTextChange(it) },
+                    onQueryChange = { onAction(RecipeAction.OnSearchTextChange(it)) },
                     onSearch = {
-                        RecipeAction.OnSearch(it)
+                        onAction(RecipeAction.OnSearch(it))
                         isSearchExpanded = false
                     },
                     onExpandedChange = { isSearchExpanded = it },
@@ -69,7 +78,12 @@ fun RecipeScreen(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
         )
-
+        Spacer(Modifier.height(8.dp))
+        if(!state.isMealsLoading) {
+            Text(
+                text = state.meals.first().meal
+            )
+        }
     }
 }
 

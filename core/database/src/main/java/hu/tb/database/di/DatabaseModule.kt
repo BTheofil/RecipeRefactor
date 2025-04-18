@@ -3,7 +3,7 @@ package hu.tb.database.di
 import androidx.room.Room
 import hu.tb.database.ShoppingDatabase
 import hu.tb.database.repository.ShoppingRepositoryImpl
-import hu.tb.domain.ShoppingRepository
+import hu.tb.core.domain.shopping.ShoppingRepository
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind

@@ -1,4 +1,4 @@
-package hu.tb.domain
+package hu.tb.core.domain.shopping
 
 import kotlinx.coroutines.flow.Flow
 
