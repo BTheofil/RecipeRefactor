@@ -36,7 +36,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -120,10 +119,6 @@ fun ShoppingScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults
-                    .topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    )
             )
         },
         floatingActionButton = {
@@ -138,12 +133,11 @@ fun ShoppingScreen(
                 )
             }
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) { scaffoldPadding ->
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(scaffoldPadding)
+                .fillMaxSize()
                 .padding(top = 8.dp)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
