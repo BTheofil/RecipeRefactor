@@ -20,7 +20,7 @@ fun MainNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = RecipeScreen
+        startDestination = ShoppingScreen
     ) {
         composable<ShoppingScreen> {
             ShoppingScreen()

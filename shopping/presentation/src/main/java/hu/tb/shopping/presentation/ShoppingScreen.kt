@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -146,29 +148,35 @@ fun ShoppingScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(
-                items = state.uncheckedItems,
-                key = { it -> it.id ?: it.hashCode() }
-            ) { item ->
-                ItemContainer(
-                    modifier = Modifier
-                        .animateItem(),
-                    item = item,
-                    onTextChange = { newText ->
-                        onAction(
-                            ShoppingAction.OnEditItemChange(
-                                item.copy(name = newText)
+            if (state.uncheckedItems.isEmpty()) {
+                item {
+                    ShoppingEmptyScreen()
+                }
+            } else {
+                items(
+                    items = state.uncheckedItems,
+                    key = { it -> it.id ?: it.hashCode() }
+                ) { item ->
+                    ItemContainer(
+                        modifier = Modifier
+                            .animateItem(),
+                        item = item,
+                        onTextChange = { newText ->
+                            onAction(
+                                ShoppingAction.OnEditItemChange(
+                                    item.copy(name = newText)
+                                )
                             )
-                        )
-                    },
-                    onCheckClick = { isChecked ->
-                        onAction(
-                            ShoppingAction.OnItemCheckChange(
-                                item.copy(isChecked = isChecked)
+                        },
+                        onCheckClick = { isChecked ->
+                            onAction(
+                                ShoppingAction.OnItemCheckChange(
+                                    item.copy(isChecked = isChecked)
+                                )
                             )
-                        )
-                    }
-                )
+                        }
+                    )
+                }
             }
             if (state.checkedItems.isNotEmpty()) {
                 item {
@@ -242,6 +250,32 @@ fun ShoppingScreen(
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun ShoppingEmptyScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.ShoppingCart,
+            tint = MaterialTheme.colorScheme.primary.copy(
+                alpha = 0.6f
+            ),
+            contentDescription = "shopping cart empty icon"
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "Your list is empty.",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary.copy(
+                alpha = 0.6f
+            )
+        )
     }
 }
 
