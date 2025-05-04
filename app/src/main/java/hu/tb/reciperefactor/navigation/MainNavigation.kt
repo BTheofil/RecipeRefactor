@@ -37,8 +37,10 @@ fun MainNavigation() {
                         NavigationBarItem(
                             selected = selectedDestination == destination,
                             onClick = {
+                                navController.navigate(destination) {
+                                    popUpTo(0)
+                                }
                                 selectedDestination = destination
-                                navController.navigate(selectedDestination)
                             },
                             icon = {
                                 Icon(

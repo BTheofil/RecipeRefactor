@@ -9,7 +9,7 @@ sealed interface Destination {
 
     @Serializable
     data class ShoppingScreen(
-        override val route: String = "ShoppingList",
+        override val route: String = "Shopping List",
         override val icon: Int = R.drawable.outline_shopping_cart_24
     ) : Destination
 
