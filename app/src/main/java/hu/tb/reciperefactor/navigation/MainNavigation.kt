@@ -20,39 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hu.tb.recipe.presentation.RecipeScreen
-import hu.tb.reciperefactor.R
 import hu.tb.shopping.presentation.ShoppingScreen
-import kotlinx.serialization.Serializable
-
-sealed interface Destination {
-    val route: String
-    val icon: Int
-
-    @Serializable
-    data class ShoppingScreen(
-        override val route: String = "ShoppingList",
-        override val icon: Int = R.drawable.outline_shopping_cart_24
-    ) : Destination
-
-    @Serializable
-    data class RecipeScreen(
-        override val route: String = "Recipe",
-        override val icon: Int = R.drawable.outline_book_24
-    ) : Destination
-
-    @Serializable
-    data class StorageScreen(
-        override val route: String = "Storage",
-        override val icon: Int = R.drawable.outline_storage_24
-    ) : Destination
-}
-
-private val destinations =
-    listOf<Destination>(
-        Destination.ShoppingScreen(),
-        Destination.RecipeScreen(),
-        Destination.StorageScreen()
-    )
 
 @Composable
 fun MainNavigation() {
