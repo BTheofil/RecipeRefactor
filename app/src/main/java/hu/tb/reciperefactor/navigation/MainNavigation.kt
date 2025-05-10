@@ -25,7 +25,7 @@ import hu.tb.shopping.presentation.ShoppingScreen
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
-    var selectedDestination by remember { mutableStateOf<Destination>(Destination.ShoppingScreen()) }
+    var selectedDestination by remember { mutableStateOf<Destination>(Destination.RecipeScreen()) }
 
     Scaffold(
         modifier = Modifier
@@ -72,7 +72,7 @@ fun MainNavigation() {
             modifier = Modifier
                 .padding(innerPadding),
             navController = navController,
-            startDestination = Destination.ShoppingScreen()
+            startDestination = selectedDestination
         ) {
             composable<Destination.ShoppingScreen> {
                 ShoppingScreen()
