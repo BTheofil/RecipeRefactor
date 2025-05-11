@@ -1,10 +1,12 @@
 package hu.tb.core.data.network.category
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CategoryResponse(
-    val meals: List<CategoryDto>
+    @SerialName("meals")
+    val categories: List<CategoryDto>
 )
 
 @Serializable

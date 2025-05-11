@@ -80,6 +80,11 @@ data class MealDto(
         Pair(strIngredient18, strMeasure18),
         Pair(strIngredient19, strMeasure19),
         Pair(strIngredient20, strMeasure20)
-    ).filter { (ingredient, _) -> !ingredient.isNullOrBlank() }
-        .map { (ingredient, measure) -> ingredient!! to measure!! }
+    ).mapNotNull { (ingredient, measure) ->
+        if (!ingredient.isNullOrBlank() && !measure.isNullOrBlank()) {
+            Pair(ingredient, measure)
+        } else {
+            null
+        }
+    }
 }

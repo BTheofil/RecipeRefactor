@@ -21,7 +21,7 @@ class CategoryDataSourceImpl(
         }
 
         return when (response) {
-            is Result.Success -> Result.Success(response.data.meals.map { it.toDomain() })
+            is Result.Success -> Result.Success(response.data.categories.map { it.toDomain() })
             is Result.Error -> Result.Error(response.error)
         }
     }
