@@ -1,8 +1,13 @@
 package hu.tb.core.data.network.meal
 
 import hu.tb.core.data.network.BASE_URL
+import hu.tb.core.data.network.response.CategoryResponse
 import hu.tb.core.data.network.handleNetworkCall
 import hu.tb.core.data.network.mapper.toDomain
+import hu.tb.core.data.network.response.MealFilterResponse
+import hu.tb.core.data.network.response.MealResponse
+import hu.tb.core.domain.meal.Category
+import hu.tb.core.domain.meal.FilterMeal
 import hu.tb.core.domain.meal.Meal
 import hu.tb.core.domain.meal.MealDataSource
 import hu.tb.core.domain.util.NetworkError
@@ -27,14 +32,28 @@ class MealDataSourceImpl(
     }
 
     override suspend fun getMealById(id: Long) {
-        TODO("Not yet implemented")
+        TODO()
     }
 
-    override suspend fun getCategories() {
-        TODO("Not yet implemented")
+    override suspend fun getCategories(): Result<List<Category>, NetworkError> {
+        val response = handleNetworkCall<CategoryResponse> {
+            httpClient.get { url("$BASE_URL/list.php?c=list") }
+        }
+
+        return when (response) {
+            is Result.Success -> Result.Success(response.data.categories.map { it.toDomain() })
+            is Result.Error -> Result.Error(response.error)
+        }
     }
 
-    override suspend fun getMealByFilter(filter: String) {
-        TODO("Not yet implemented")
+    override suspend fun getMealByFilter(filter: String): Result<List<FilterMeal>, NetworkError> {
+        val response = handleNetworkCall<MealFilterResponse> {
+            httpClient.get { url("$BASE_URL/filter.php?c=$filter") }
+        }
+
+        return when (response) {
+            is Result.Success -> Result.Success(response.data.filteredMeals.map { it.toDomain() })
+            is Result.Error -> Result.Error(response.error)
+        }
     }
 }

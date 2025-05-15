@@ -9,7 +9,7 @@ interface MealDataSource {
 
     suspend fun getMealById(id: Long)
 
-    suspend fun getCategories()
+    suspend fun getCategories(): Result<List<Category>, NetworkError>
 
-    suspend fun getMealByFilter(filter: String)
+    suspend fun getMealByFilter(filter: String): Result<List<FilterMeal>, NetworkError>
 }

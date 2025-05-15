@@ -1,4 +1,4 @@
-package hu.tb.core.data.network.category
+package hu.tb.core.data.network.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

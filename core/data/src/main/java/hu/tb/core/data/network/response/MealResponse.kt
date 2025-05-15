@@ -1,4 +1,4 @@
-package hu.tb.core.data.network.meal
+package hu.tb.core.data.network.response
 
 import kotlinx.serialization.Serializable
 
