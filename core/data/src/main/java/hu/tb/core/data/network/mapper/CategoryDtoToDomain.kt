@@ -1,6 +1,6 @@
 package hu.tb.core.data.network.mapper
 
-import hu.tb.core.data.network.category.CategoryDto
-import hu.tb.core.domain.category.Category
+import hu.tb.core.data.network.response.CategoryDto
+import hu.tb.core.domain.meal.Category
 
 fun CategoryDto.toDomain(): Category = Category(name = strCategory)

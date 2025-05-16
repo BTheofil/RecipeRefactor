@@ -17,12 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,22 +33,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
+import hu.tb.core.domain.meal.FilterMeal
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RecipeScreen(
-    viewModel: RecipeViewModel = koinViewModel()
+    viewModel: RecipeViewModel = koinViewModel(),
 ) {
     RecipeScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        showMoreMealClick = {}
     )
 }
 
@@ -54,7 +58,8 @@ fun RecipeScreen(
 @Composable
 fun RecipeScreen(
     state: RecipeState,
-    onAction: (RecipeAction) -> Unit
+    onAction: (RecipeAction) -> Unit,
+    showMoreMealClick: () -> Unit
 ) {
     var isSearchExpanded by remember {
         mutableStateOf(false)
@@ -64,7 +69,8 @@ fun RecipeScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 8.dp)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         SearchBar(
             modifier = Modifier
@@ -90,10 +96,10 @@ fun RecipeScreen(
             },
             expanded = isSearchExpanded,
             onExpandedChange = { isSearchExpanded = it },
-            content = {},
             colors = SearchBarDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
+            ),
+            content = {},
         )
         Spacer(Modifier.height(16.dp))
         Text(
@@ -129,16 +135,14 @@ fun RecipeScreen(
                         AsyncImage(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(16.dp)),
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(state.meals.first().image)
-                                .build(),
+                            model = state.meals.first().image,
                             contentDescription = "meal image",
                         )
                     }
                 }
             }
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(24.dp))
         AnimatedContent(
             targetState = state.isCategoriesLoading
         ) { isLoading ->
@@ -171,6 +175,76 @@ fun RecipeScreen(
                 }
             }
         }
+        Spacer(Modifier.height(8.dp))
+        AnimatedContent(
+            targetState = state.isFilterMealLoading
+        ) { isLoading ->
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Column {
+                    state.filterMeals.chunked(2).take(2).forEach { meals ->
+                        Row {
+                            meals.forEach { meal ->
+                                FilterMealCard(
+                                    modifier = Modifier
+                                        .weight(1f),
+                                    meal = meal
+                                )
+                            }
+                        }
+                    }
+                    TextButton(
+                        modifier = Modifier,
+                        onClick = showMoreMealClick
+                    ) {
+                        Text("show")
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(28.dp))
+        Text(
+            text = "Your recipes",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun FilterMealCard(
+    modifier: Modifier = Modifier,
+    meal: FilterMeal
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .border(
+                4.dp, MaterialTheme.colorScheme.secondary,
+                RoundedCornerShape(16.dp)
+            )
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(16.dp)
+    ) {
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .clip(RoundedCornerShape(16.dp)),
+            model = meal.image,
+            contentScale = ContentScale.FillWidth,
+            contentDescription = "filter meal image"
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = meal.name,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -179,8 +253,13 @@ fun RecipeScreen(
 private fun RecipeScreenPreview() {
     AppTheme {
         RecipeScreen(
-            state = RecipeState(),
-            onAction = {}
+            state = RecipeState(
+                isCategoriesLoading = true,
+                isMealsLoading = true,
+                isFilterMealLoading = true
+            ),
+            onAction = {},
+            showMoreMealClick = {}
         )
     }
 }
