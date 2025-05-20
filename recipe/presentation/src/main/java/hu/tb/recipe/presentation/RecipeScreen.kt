@@ -170,7 +170,7 @@ fun RecipeScreen(
                     state.categories.forEachIndexed { index, category ->
                         FilterChip(
                             selected = state.selectedCategoryIndex == index + 1,
-                            onClick = { onAction(RecipeAction.OnFilterCategoryClick(1)) },
+                            onClick = { onAction(RecipeAction.OnFilterCategoryClick(index+1)) },
                             label = {
                                 Text(
                                     text = category.name,
