@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -153,24 +153,35 @@ fun RecipeScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (isLoading) {
-                    repeat(5) {
+                    repeat(6) {
                         Box(
                             modifier = Modifier
-                                .clip(CircleShape)
+                                .border(
+                                    2.dp,
+                                    MaterialTheme.colorScheme.primary,
+                                    RoundedCornerShape(16.dp)
+                                )
+                                .padding(4.dp)
                         ) {
                             CircularProgressIndicator()
                         }
                     }
                 } else {
-                    state.categories.forEach { category ->
-                        Box(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                        ) {
-                            Text(
-                                text = category.name
-                            )
-                        }
+                    state.categories.forEachIndexed { index, category ->
+                        FilterChip(
+                            selected = state.selectedCategoryIndex == index + 1,
+                            onClick = { onAction(RecipeAction.OnFilterCategoryClick(1)) },
+                            label = {
+                                Text(
+                                    text = category.name,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = if (state.selectedCategoryIndex == index + 1)
+                                        MaterialTheme.colorScheme.onSecondaryContainer
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                        )
                     }
                 }
             }
@@ -180,11 +191,42 @@ fun RecipeScreen(
             targetState = state.isFilterMealLoading
         ) { isLoading ->
             if (isLoading) {
-                CircularProgressIndicator()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .padding(4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             } else {
-                Column {
-                    state.filterMeals.chunked(2).take(2).forEach { meals ->
-                        Row {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        TextButton(
+                            onClick = showMoreMealClick
+                        ) {
+                            Text(
+                                text = "See all >>",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    state.filterMeals.chunked(2).take(3).forEach { meals ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             meals.forEach { meal ->
                                 FilterMealCard(
                                     modifier = Modifier
@@ -193,12 +235,7 @@ fun RecipeScreen(
                                 )
                             }
                         }
-                    }
-                    TextButton(
-                        modifier = Modifier,
-                        onClick = showMoreMealClick
-                    ) {
-                        Text("show")
+                        Spacer(modifier = Modifier.height(22.dp))
                     }
                 }
             }
@@ -220,25 +257,25 @@ private fun FilterMealCard(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .border(
-                4.dp, MaterialTheme.colorScheme.secondary,
-                RoundedCornerShape(16.dp)
-            )
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(16.dp)
     ) {
         AsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(88.dp)
-                .clip(RoundedCornerShape(16.dp)),
+                .height(100.dp)
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp
+                    )
+                ),
             model = meal.image,
             contentScale = ContentScale.FillWidth,
             contentDescription = "filter meal image"
         )
         Spacer(Modifier.height(8.dp))
         Text(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 8.dp),
             text = meal.name,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -256,7 +293,7 @@ private fun RecipeScreenPreview() {
             state = RecipeState(
                 isCategoriesLoading = true,
                 isMealsLoading = true,
-                isFilterMealLoading = true
+                isFilterMealLoading = false
             ),
             onAction = {},
             showMoreMealClick = {}
