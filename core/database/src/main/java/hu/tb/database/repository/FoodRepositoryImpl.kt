@@ -17,7 +17,5 @@ class FoodRepositoryImpl(
         dao.delete(category.toEntity())
 
     override suspend fun getAll(): List<Category> =
-        dao.getAll().map { items ->
-            items.toDomain()
-        }
+        dao.getAll().map { category -> category.toDomain() }
 }
