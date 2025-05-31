@@ -10,6 +10,7 @@ data class RecipeState(
     val isErrorOccurred: Boolean = false,
     val categories: List<Category> = emptyList(),
     val isCategoriesLoading: Boolean = false,
+    val isCategoryFailed: Boolean = false,
     val searchField: String = "",
     val selectedFilter: String = "Beef",
     val filterMeals: List<FilterMeal> = emptyList(),
