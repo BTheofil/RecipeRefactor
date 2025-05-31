@@ -10,8 +10,8 @@ class FoodRepositoryImpl(
     private val dao: FoodDao
 ) : FoodRepository {
 
-    override suspend fun save(category: Category) =
-        dao.insert(category.toEntity())
+    override suspend fun saveAll(categories: List<Category>) =
+        dao.insert(categories.map { it.toEntity() })
 
     override suspend fun delete(category: Category) =
         dao.delete(category.toEntity())

@@ -42,6 +42,8 @@ import coil3.compose.AsyncImage
 import hu.tb.core.domain.meal.FilterMeal
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
+import kotlin.collections.chunked
+import kotlin.collections.forEach
 
 @Composable
 fun RecipeScreen(
@@ -61,10 +63,6 @@ fun RecipeScreen(
     onAction: (RecipeAction) -> Unit,
     showMoreMealClick: () -> Unit
 ) {
-    var isSearchExpanded by remember {
-        mutableStateOf(false)
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,173 +71,15 @@ fun RecipeScreen(
             .verticalScroll(rememberScrollState()),
     ) {
         SearchBar(
-            modifier = Modifier
-                .fillMaxWidth(),
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = state.searchField,
-                    onQueryChange = { onAction(RecipeAction.OnSearchTextChange(it)) },
-                    onSearch = {
-                        onAction(RecipeAction.OnSearch(it))
-                        isSearchExpanded = false
-                    },
-                    onExpandedChange = { isSearchExpanded = it },
-                    expanded = isSearchExpanded,
-                    placeholder = {
-                        Text(
-                            text = "Search meal...",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                )
-            },
-            expanded = isSearchExpanded,
-            onExpandedChange = { isSearchExpanded = it },
-            colors = SearchBarDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            content = {},
+            state = state,
+            onAction = onAction
         )
         Spacer(Modifier.height(16.dp))
-        Text(
-            text = "Recommended meals",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .size(128.dp)
-                    .border(
-                        4.dp,
-                        MaterialTheme.colorScheme.secondary,
-                        RoundedCornerShape(16.dp)
-                    )
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                AnimatedContent(
-                    targetState = state.isMealsLoading
-                ) { isLoading ->
-                    if (isLoading) {
-                        CircularProgressIndicator()
-                    } else {
-                        AsyncImage(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp)),
-                            model = state.meals.first().image,
-                            contentDescription = "meal image",
-                        )
-                    }
-                }
-            }
-        }
+        RecommendedMeals(state)
         Spacer(Modifier.height(24.dp))
-        AnimatedContent(
-            targetState = state.isCategoriesLoading
-        ) { isLoading ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                if (isLoading) {
-                    repeat(6) {
-                        Box(
-                            modifier = Modifier
-                                .border(
-                                    2.dp,
-                                    MaterialTheme.colorScheme.primary,
-                                    RoundedCornerShape(16.dp)
-                                )
-                                .padding(4.dp)
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                } else {
-                    state.categories.forEachIndexed { index, category ->
-                        FilterChip(
-                            selected = state.selectedCategoryIndex == index + 1,
-                            onClick = { onAction(RecipeAction.OnFilterCategoryClick(index+1)) },
-                            label = {
-                                Text(
-                                    text = category.name,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = if (state.selectedCategoryIndex == index + 1)
-                                        MaterialTheme.colorScheme.onSecondaryContainer
-                                    else
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                        )
-                    }
-                }
-            }
-        }
+        CategoriesFilterClips(state, onAction)
         Spacer(Modifier.height(8.dp))
-        AnimatedContent(
-            targetState = state.isFilterMealLoading
-        ) { isLoading ->
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .padding(4.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.TopEnd
-                    ) {
-                        TextButton(
-                            onClick = showMoreMealClick
-                        ) {
-                            Text(
-                                text = "See all >>",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                    state.filterMeals.chunked(2).take(3).forEach { meals ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            meals.forEach { meal ->
-                                FilterMealCard(
-                                    modifier = Modifier
-                                        .weight(1f),
-                                    meal = meal
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(22.dp))
-                    }
-                }
-            }
-        }
+        FilteredMealSection(state, showMoreMealClick)
         Spacer(Modifier.height(28.dp))
         Text(
             text = "Your recipes",
@@ -247,6 +87,143 @@ fun RecipeScreen(
             color = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.height(8.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SearchBar(
+    state: RecipeState,
+    onAction: (RecipeAction) -> Unit
+) {
+    var isSearchExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    SearchBar(
+        modifier = Modifier
+            .fillMaxWidth(),
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = state.searchField,
+                onQueryChange = { onAction(RecipeAction.OnSearchTextChange(it)) },
+                onSearch = {
+                    onAction(RecipeAction.OnSearch(it))
+                    isSearchExpanded = false
+                },
+                onExpandedChange = { isSearchExpanded = it },
+                expanded = isSearchExpanded,
+                placeholder = {
+                    Text(
+                        text = "Search meal...",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            )
+        },
+        expanded = isSearchExpanded,
+        onExpandedChange = { isSearchExpanded = it },
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        content = {},
+    )
+}
+
+@Composable
+private fun RecommendedMeals(
+    state: RecipeState
+) {
+    Text(
+        text = "Recommended meals",
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.primary
+    )
+    Spacer(Modifier.height(8.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .size(128.dp)
+                .border(
+                    4.dp,
+                    MaterialTheme.colorScheme.secondary,
+                    RoundedCornerShape(16.dp)
+                )
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            AnimatedContent(
+                targetState = state.isMealsLoading
+            ) { isLoading ->
+                if (isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    AsyncImage(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp)),
+                        model = state.meals.first().image,
+                        contentDescription = "meal image",
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoriesFilterClips(
+    state: RecipeState,
+    onAction: (RecipeAction) -> Unit
+) {
+    AnimatedContent(
+        targetState = state.isCategoriesLoading
+    ) { isLoading ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (isLoading) {
+                repeat(6) {
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                2.dp,
+                                MaterialTheme.colorScheme.primary,
+                                RoundedCornerShape(16.dp)
+                            )
+                            .padding(4.dp)
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else {
+                state.categories.forEach { category ->
+                    FilterChip(
+                        selected = state.selectedFilter == category.name,
+                        onClick = { onAction(RecipeAction.OnFilterCategoryClick(category.name)) },
+                        label = {
+                            Text(
+                                text = category.name,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = if (state.selectedFilter == category.name)
+                                    MaterialTheme.colorScheme.onSecondaryContainer
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -274,7 +251,8 @@ private fun FilterMealCard(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 8.dp),
             text = meal.name,
             style = MaterialTheme.typography.bodyLarge,
@@ -282,6 +260,66 @@ private fun FilterMealCard(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+    }
+}
+
+@Composable
+private fun FilteredMealSection(
+    state: RecipeState,
+    showMoreMealClick: () -> Unit
+) {
+    AnimatedContent(
+        targetState = state.isFilterMealLoading
+    ) { isLoading ->
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    TextButton(
+                        onClick = showMoreMealClick
+                    ) {
+                        Text(
+                            text = "See all >>",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                state.filterMeals.chunked(2).take(3).forEach { meals ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        meals.forEach { meal ->
+                            FilterMealCard(
+                                modifier = Modifier
+                                    .weight(1f),
+                                meal = meal
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(22.dp))
+                }
+            }
+        }
     }
 }
 

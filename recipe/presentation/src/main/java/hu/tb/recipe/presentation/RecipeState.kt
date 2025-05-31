@@ -9,7 +9,6 @@ data class RecipeState(
     val isMealsLoading: Boolean = false,
     val isErrorOccurred: Boolean = false,
     val categories: List<Category> = emptyList(),
-    val selectedCategoryIndex: Int = 1,
     val isCategoriesLoading: Boolean = false,
     val isCategoryFailed: Boolean = false,
     val searchField: String = "",

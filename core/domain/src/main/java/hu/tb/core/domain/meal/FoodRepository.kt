@@ -2,7 +2,7 @@ package hu.tb.core.domain.meal
 
 interface FoodRepository {
 
-    suspend fun save(category: Category)
+    suspend fun saveAll(categories: List<Category>)
 
     suspend fun delete(category: Category)
 

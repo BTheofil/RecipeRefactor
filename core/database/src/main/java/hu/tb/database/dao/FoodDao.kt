@@ -10,7 +10,7 @@ import hu.tb.database.entity.CategoryEntity
 @Dao
 interface FoodDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entity: CategoryEntity)
+    suspend fun insert(entities: List<CategoryEntity>)
 
     @Delete
     suspend fun delete(entity: CategoryEntity)

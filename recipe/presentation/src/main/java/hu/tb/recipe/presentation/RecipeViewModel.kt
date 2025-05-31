@@ -59,12 +59,18 @@ class RecipeViewModel(
                     )
                 }
 
-            is RecipeAction.OnFilterCategoryClick ->
+            is RecipeAction.OnFilterCategoryClick -> {
                 _state.update {
                     it.copy(
-                        selectedCategoryIndex = action.index
+                        selectedFilter = action.filterName
                     )
                 }
+                viewModelScope.launch {
+                    _state.update { it.copy(isFilterMealLoading = true) }
+                    getFilterMeals()
+                }
+            }
+
         }
 
     private suspend fun getMeals() {
@@ -94,10 +100,7 @@ class RecipeViewModel(
     }
 
     private suspend fun saveCategories(categories: List<Category>) =
-        categories.forEach {
-            foodRepository.save(it)
-        }
-
+        foodRepository.saveAll(categories)
 
     private suspend fun getFilterMeals() {
         when (val result = mealDataSource.getMealByFilter(state.value.selectedFilter)) {
