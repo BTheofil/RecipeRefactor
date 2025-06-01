@@ -37,9 +37,10 @@ fun MainNavigation() {
                         NavigationBarItem(
                             selected = selectedDestination == destination,
                             onClick = {
-                                navController.navigate(destination) {
-                                    popUpTo(0)
-                                }
+                                if (selectedDestination == destination) return@NavigationBarItem
+
+                                navController.navigate(destination)
+
                                 selectedDestination = destination
                             },
                             icon = {
@@ -89,5 +90,4 @@ fun MainNavigation() {
             }
         }
     }
-
 }
