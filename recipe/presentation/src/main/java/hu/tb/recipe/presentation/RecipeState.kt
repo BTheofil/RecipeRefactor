@@ -12,7 +12,7 @@ data class RecipeState(
     val isCategoriesLoading: Boolean = false,
     val isCategoryFailed: Boolean = false,
     val searchField: String = "",
-    val selectedFilter: String = "Beef",
+    val selectedFilter: Category = Category("Beef"),
     val filterMeals: List<FilterMeal> = emptyList(),
     val isFilterMealLoading: Boolean = false
 )

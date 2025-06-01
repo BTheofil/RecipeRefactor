@@ -3,7 +3,6 @@ package hu.tb.recipe.presentation
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +28,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,8 +45,6 @@ import coil3.compose.AsyncImage
 import hu.tb.core.domain.meal.FilterMeal
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
-import kotlin.collections.chunked
-import kotlin.collections.forEach
 
 @Composable
 fun RecipeScreen(
@@ -185,14 +186,27 @@ private fun CategoriesFilterClips(
     AnimatedContent(
         targetState = state.isCategoriesLoading
     ) { isLoading ->
-        Row(
+        val scrollState = rememberLazyListState()
+
+        LaunchedEffect(state.selectedFilter) {
+            scrollState.animateScrollToItem(
+                index = if (state.categories.indexOf(state.selectedFilter) < 0)
+                    0
+                else
+                    state.categories.indexOf(state.selectedFilter)
+            )
+        }
+
+        LazyRow(
             modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxWidth(),
+            state = scrollState,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (isLoading) {
-                repeat(6) {
+                items(
+                    count = 6
+                ) {
                     Box(
                         modifier = Modifier
                             .border(
@@ -206,15 +220,17 @@ private fun CategoriesFilterClips(
                     }
                 }
             } else {
-                state.categories.forEach { category ->
+                items(
+                    items = state.categories,
+                ) { category ->
                     FilterChip(
-                        selected = state.selectedFilter == category.name,
-                        onClick = { onAction(RecipeAction.OnFilterCategoryClick(category.name)) },
+                        selected = state.selectedFilter == category,
+                        onClick = { onAction(RecipeAction.OnFilterCategoryClick(category)) },
                         label = {
                             Text(
                                 text = category.name,
                                 style = MaterialTheme.typography.labelLarge,
-                                color = if (state.selectedFilter == category.name)
+                                color = if (state.selectedFilter == category)
                                     MaterialTheme.colorScheme.onSecondaryContainer
                                 else
                                     MaterialTheme.colorScheme.onSurfaceVariant

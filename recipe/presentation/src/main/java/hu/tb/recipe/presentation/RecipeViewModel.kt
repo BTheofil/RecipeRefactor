@@ -21,16 +21,11 @@ class RecipeViewModel(
 
     init {
         viewModelScope.launch {
-            _state.update { it.copy(isCategoriesLoading = true) }
             val categories = foodRepository.getAll()
             if (categories.isNotEmpty()) {
-                _state.update {
-                    it.copy(
-                        categories = categories,
-                        isCategoriesLoading = false
-                    )
-                }
+                _state.update { it.copy(categories = categories) }
             } else {
+                _state.update { it.copy(isCategoriesLoading = true) }
                 getCategories()
                 if (!state.value.isCategoryFailed)
                     saveCategories(state.value.categories)
@@ -38,14 +33,24 @@ class RecipeViewModel(
         }
 
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isMealsLoading = true,
-                    isFilterMealLoading = true
-                )
-            }
+            _state.update { it.copy(isMealsLoading = true) }
             getMeals()
-            getFilterMeals()
+
+            if (mealDataSource.filterMeals.value.filterMealList.isEmpty()) {
+                _state.update {
+                    it.copy(
+                        isFilterMealLoading = true
+                    )
+                }
+                getFilterMeals()
+            } else {
+                _state.update {
+                    it.copy(
+                        filterMeals = mealDataSource.filterMeals.value.filterMealList,
+                        selectedFilter = mealDataSource.filterMeals.value.category,
+                    )
+                }
+            }
         }
     }
 
@@ -62,7 +67,7 @@ class RecipeViewModel(
             is RecipeAction.OnFilterCategoryClick -> {
                 _state.update {
                     it.copy(
-                        selectedFilter = action.filterName
+                        selectedFilter = action.category
                     )
                 }
                 viewModelScope.launch {
