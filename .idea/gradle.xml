@@ -20,6 +20,8 @@
             <option value="$PROJECT_DIR$/recipe/presentation" />
             <option value="$PROJECT_DIR$/shopping" />
             <option value="$PROJECT_DIR$/shopping/presentation" />
+            <option value="$PROJECT_DIR$/storage" />
+            <option value="$PROJECT_DIR$/storage/presentation" />
           </set>
         </option>
       </GradleProjectSettings>
