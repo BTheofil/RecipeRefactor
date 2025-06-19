@@ -5,19 +5,14 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,13 +20,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,15 +35,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import hu.tb.presentation.components.CategoryItem
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -116,7 +107,7 @@ private fun StorageScreen(
                 itemsIndexed(
                     items = state.categories
                 ) { index, item ->
-                    GroupItem(
+                    CategoryItem(
                         modifier = Modifier
                             .onGloballyPositioned { coordinates ->
                                 groupItemHeightDp = with(density) { coordinates.size.height.toDp() }
@@ -124,6 +115,7 @@ private fun StorageScreen(
                             .graphicsLayer {
                                 translationX = groupItemShakeValue.value
                             },
+                        deleteIconPadding = DELETE_ICON_OFFSET_DP,
                         title = item,
                         onGroupItemClick = { action(StorageAction.OnCategoryClick) },
                         onEditGroupClick = {
@@ -167,89 +159,17 @@ private fun StorageScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        Row {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
                             Text(
                                 text = item
                             )
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun GroupItem(
-    modifier: Modifier = Modifier,
-    title: String,
-    onGroupItemClick: () -> Unit,
-    onEditGroupClick: () -> Unit,
-    onDeleteGroupClick: () -> Unit,
-    isDeleteActive: Boolean = false,
-    isGroupSelected: Boolean = false
-) {
-    Box(
-        modifier = modifier
-            .padding(top = DELETE_ICON_OFFSET_DP)
-            .then(
-                if (isGroupSelected) {
-                    Modifier
-                        .border(4.dp, MaterialTheme.colorScheme.tertiary, CardDefaults.shape)
-                } else {
-                    Modifier
-                }
-            )
-
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .combinedClickable(
-                    onClick = onGroupItemClick,
-                    onLongClick = onEditGroupClick
-                )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        vertical = 12.dp,
-                        horizontal = 8.dp
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "Count: " + "4",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-        }
-        if (isDeleteActive) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(x = DELETE_ICON_OFFSET_DP, y = -DELETE_ICON_OFFSET_DP),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.error)
-                        .padding(2.dp)
-                        .clickable(
-                            onClick = onDeleteGroupClick
-                        ),
-                    imageVector = Icons.Default.Clear,
-                    tint = MaterialTheme.colorScheme.onError,
-                    contentDescription = "delete group icon"
-                )
             }
         }
     }
