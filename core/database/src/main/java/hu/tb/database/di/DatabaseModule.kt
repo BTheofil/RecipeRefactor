@@ -1,11 +1,13 @@
 package hu.tb.database.di
 
 import androidx.room.Room
+import hu.tb.core.domain.meal.CategoryRepository
 import hu.tb.core.domain.meal.FoodRepository
 import hu.tb.database.ShoppingDatabase
 import hu.tb.database.repository.ShoppingRepositoryImpl
 import hu.tb.core.domain.shopping.ShoppingRepository
 import hu.tb.database.FoodDatabase
+import hu.tb.database.repository.CategoryRepositoryImpl
 import hu.tb.database.repository.FoodRepositoryImpl
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.singleOf
@@ -35,6 +37,8 @@ val databaseModule = module {
     }
 
     single { get<FoodDatabase>().foodDao() }
+    single { get<FoodDatabase>().categoryDao() }
 
     singleOf(::FoodRepositoryImpl).bind<FoodRepository>()
+    singleOf(::CategoryRepositoryImpl).bind<CategoryRepository>()
 }

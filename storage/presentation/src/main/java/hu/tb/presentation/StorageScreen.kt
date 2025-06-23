@@ -64,7 +64,7 @@ private fun StorageScreen(
     action: (StorageAction) -> Unit
 ) {
     val density = LocalDensity.current
-    var groupItemHeightDp by remember { mutableStateOf(0.dp) }
+    var groupItemHeightDp by remember { mutableStateOf(88.dp) }
 
     var isGroupDeleteActive by remember { mutableStateOf(false) }
 
@@ -89,7 +89,7 @@ private fun StorageScreen(
             .fillMaxSize(),
         topBar = {
             Spacer(Modifier.height(64.dp))
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -97,6 +97,11 @@ private fun StorageScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+            Text(
+                text = "Categories",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
             LazyVerticalGrid(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -147,6 +152,12 @@ private fun StorageScreen(
                 }
             }
             Spacer(Modifier.height(24.dp))
+            Text(
+                text = "Products",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(8.dp))
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth(),

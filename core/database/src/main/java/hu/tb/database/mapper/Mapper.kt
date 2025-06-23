@@ -1,10 +1,15 @@
 package hu.tb.database.mapper
 
 import hu.tb.core.domain.meal.Category
+import hu.tb.core.domain.meal.Food
 import hu.tb.database.entity.ShoppingItemEntity
 import hu.tb.core.domain.shopping.ShoppingItem
 import hu.tb.database.entity.CategoryEntity
+import hu.tb.database.entity.FoodEntity
 
+/**
+ * Shopping
+ **/
 fun ShoppingItemEntity.toDomain(): ShoppingItem =
     ShoppingItem(
         id = id,
@@ -19,13 +24,32 @@ fun ShoppingItem.toEntity(): ShoppingItemEntity =
         isChecked = isChecked
     )
 
-//===Food===
+/**
+ * Category
+ **/
 fun CategoryEntity.toDomain(): Category =
     Category(
-        name = name
+        name = categoryName
     )
 
 fun Category.toEntity(): CategoryEntity =
     CategoryEntity(
-        name = name
+        categoryName = name
+    )
+
+/**
+ * Food
+ **/
+fun FoodEntity.toDomain(): Food =
+    Food(
+        name = foodName,
+        category = categoryEntity.toDomain(),
+        quantity = quantity
+    )
+
+fun Food.toEntity(): FoodEntity =
+    FoodEntity(
+        foodName = name,
+        categoryEntity = category.toEntity(),
+        quantity = quantity
     )
