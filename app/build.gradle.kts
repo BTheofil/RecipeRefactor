@@ -68,4 +68,5 @@ dependencies {
     implementation(projects.core.presentation)
     implementation(projects.shopping.presentation)
     implementation(projects.recipe.presentation)
+    implementation(projects.storage.presentation)
 }

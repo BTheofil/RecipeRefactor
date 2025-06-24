@@ -1,6 +1,6 @@
 package hu.tb.database.repository
 
-import hu.tb.core.domain.meal.Category
+import hu.tb.core.domain.meal.Food
 import hu.tb.core.domain.meal.FoodRepository
 import hu.tb.database.dao.FoodDao
 import hu.tb.database.mapper.toDomain
@@ -10,12 +10,12 @@ class FoodRepositoryImpl(
     private val dao: FoodDao
 ) : FoodRepository {
 
-    override suspend fun saveAll(categories: List<Category>) =
-        dao.insert(categories.map { it.toEntity() })
+    override suspend fun insert(food: Food) =
+        dao.insert(food.toEntity())
 
-    override suspend fun delete(category: Category) =
-        dao.delete(category.toEntity())
+    override suspend fun delete(food: Food) =
+        dao.delete(food.toEntity())
 
-    override suspend fun getAll(): List<Category> =
-        dao.getAll().map { category -> category.toDomain() }
+    override suspend fun getAll(): List<Food> =
+        dao.getAll().map { food -> food.toDomain() }
 }

@@ -1,6 +1,5 @@
 package hu.tb.reciperefactor.navigation
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -19,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import hu.tb.presentation.StorageScreen
 import hu.tb.recipe.presentation.RecipeScreen
 import hu.tb.shopping.presentation.ShoppingScreen
 
@@ -84,9 +84,7 @@ fun MainNavigation() {
             }
 
             composable<Destination.StorageScreen> {
-                Box(content = {
-                    Text("storage screen")
-                })
+                StorageScreen()
             }
         }
     }
