@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.presentation.components.CategoryItem
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
@@ -53,7 +54,7 @@ fun StorageScreen(
     viewModel: StorageViewModel = koinViewModel()
 ) {
     StorageScreen(
-        state = StorageState(),
+        state = viewModel.state.collectAsStateWithLifecycle().value,
         action = viewModel::onAction
     )
 }
@@ -122,6 +123,7 @@ private fun StorageScreen(
                             },
                         deleteIconPadding = DELETE_ICON_OFFSET_DP,
                         title = item,
+                        count = 4,
                         onGroupItemClick = { action(StorageAction.OnCategoryClick) },
                         onEditGroupClick = {
                             isGroupDeleteActive = !isGroupDeleteActive

@@ -30,6 +30,7 @@ fun CategoryItem(
     modifier: Modifier = Modifier,
     deleteIconPadding: Dp = 8.dp,
     title: String,
+    count: Int,
     onGroupItemClick: () -> Unit,
     onEditGroupClick: () -> Unit,
     onDeleteGroupClick: () -> Unit,
@@ -72,7 +73,7 @@ fun CategoryItem(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Count: " + "4",
+                    text = "Count: $count",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -108,6 +109,7 @@ private fun CategoryItemPreview() {
    MaterialTheme {
        CategoryItem(
            title = "category",
+           count = 4,
            onGroupItemClick = {},
            onEditGroupClick = {},
            onDeleteGroupClick = {},
