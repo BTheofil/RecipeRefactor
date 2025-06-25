@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import hu.tb.presentation.StorageScreen
+import hu.tb.presentation.navigation.storageGraph
 import hu.tb.recipe.presentation.RecipeScreen
 import hu.tb.shopping.presentation.ShoppingScreen
 
@@ -83,9 +83,7 @@ fun MainNavigation() {
                 RecipeScreen()
             }
 
-            composable<Destination.StorageScreen> {
-                StorageScreen()
-            }
+            storageGraph<Destination.StorageScreen>(navController)
         }
     }
 }

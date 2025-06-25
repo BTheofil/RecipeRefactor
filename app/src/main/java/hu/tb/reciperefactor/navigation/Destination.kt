@@ -27,7 +27,7 @@ sealed interface Destination {
 }
 
 val destinations =
-    listOf<Destination>(
+    listOf(
         Destination.ShoppingScreen(),
         Destination.RecipeScreen(),
         Destination.StorageScreen()

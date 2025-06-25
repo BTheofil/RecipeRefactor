@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version libs.versions.kotlin
 }
 
 android {
@@ -46,8 +47,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(platform(libs.androidx.compose.bom))
 
+    implementation(libs.androidx.navigation)
+
     implementation(libs.koin)
     implementation(libs.koin.compose)
 
     implementation(projects.core.presentation)
+    implementation(projects.core.domain)
 }
