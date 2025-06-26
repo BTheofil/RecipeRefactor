@@ -19,8 +19,8 @@ class ShoppingViewModel(
     init {
         viewModelScope.launch {
             repository.getAllItem().collect { repoItems ->
-                val unchecked = repoItems.filter { it.isChecked == false }
-                val checked = repoItems.filter { it.isChecked == true }
+                val unchecked = repoItems.filter { !it.isChecked }
+                val checked = repoItems.filter { it.isChecked }
                 _state.update {
                     ShoppingState(
                         uncheckedItems = unchecked,

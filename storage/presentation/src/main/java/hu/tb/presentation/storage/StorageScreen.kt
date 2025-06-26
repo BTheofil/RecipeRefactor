@@ -1,11 +1,10 @@
-package hu.tb.presentation
+package hu.tb.presentation.storage
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,12 +19,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,14 +30,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import hu.tb.core.domain.meal.Category
 import hu.tb.presentation.components.CategoryItem
+import hu.tb.presentation.components.PlusButton
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -51,8 +49,20 @@ private val DELETE_ICON_OFFSET_DP = 8.dp
 
 @Composable
 fun StorageScreen(
-    viewModel: StorageViewModel = koinViewModel()
+    viewModel: StorageViewModel = koinViewModel(),
+    onCreationRequested: () -> Unit
 ) {
+    val lifeCycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel.event, lifeCycleOwner) {
+        lifeCycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.event.collect { event ->
+                when (event) {
+                    is StorageEvent.NavigateToCreation -> onCreationRequested()
+                }
+            }
+        }
+    }
+
     StorageScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
         action = viewModel::onAction
@@ -122,7 +132,7 @@ private fun StorageScreen(
                                 translationX = groupItemShakeValue.value
                             },
                         deleteIconPadding = DELETE_ICON_OFFSET_DP,
-                        title = item,
+                        title = item.name,
                         count = 4,
                         onGroupItemClick = { action(StorageAction.OnCategoryClick) },
                         onEditGroupClick = {
@@ -134,23 +144,12 @@ private fun StorageScreen(
                     )
                 }
                 item {
-                    IconButton(
+                    PlusButton(
                         modifier = Modifier
                             .padding(top = DELETE_ICON_OFFSET_DP)
-                            .size(groupItemHeightDp - DELETE_ICON_OFFSET_DP)
-                            .border(
-                                1.dp,
-                                Color.Black.copy(alpha = 0.3f),
-                                RoundedCornerShape(16.dp)
-                            ),
+                            .size(groupItemHeightDp - DELETE_ICON_OFFSET_DP),
                         onClick = { action(StorageAction.OnAddCategoryClick) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Add,
-                            tint = MaterialTheme.colorScheme.primary,
-                            contentDescription = "Create new group icon"
-                        )
-                    }
+                    )
                 }
             }
             Spacer(Modifier.height(24.dp))
@@ -183,6 +182,13 @@ private fun StorageScreen(
                         }
                     }
                 }
+                item {
+                    PlusButton(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = { action(StorageAction.OnAddFoodClick) }
+                    )
+                }
             }
         }
     }
@@ -194,7 +200,9 @@ private fun StorageScreenPreview() {
 
     val mockState = StorageState(
         categories = listOf(
-            "meet", "fruit", "milk"
+            Category("meal"),
+            Category("fruit"),
+            Category("milk"),
         ),
         foods = listOf(
             "apple", "banana", "lemon"
