@@ -5,11 +5,16 @@ import androidx.lifecycle.viewModelScope
 import hu.tb.core.domain.meal.Category
 import hu.tb.core.domain.meal.Food
 import hu.tb.core.domain.meal.FoodRepository
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class CreationViewModel(
     private val foodRepository: FoodRepository
 ) : ViewModel() {
+
+    private val _event = Channel<CreationEvent>()
+    val event = _event.receiveAsFlow()
 
     fun onAction(action: CreationAction) {
         when (action) {
@@ -23,6 +28,7 @@ class CreationViewModel(
                         quantity = 1
                     )
                 )
+                _event.send(CreationEvent.ProductInserted)
             }
         }
     }

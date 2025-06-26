@@ -15,10 +15,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import hu.tb.presentation.navigation.storageGraph
+import androidx.navigation.navigation
+import hu.tb.presentation.create.CreationScreen
+import hu.tb.presentation.storage.StorageScreen
 import hu.tb.recipe.presentation.RecipeScreen
 import hu.tb.shopping.presentation.ShoppingScreen
 
@@ -83,7 +87,22 @@ fun MainNavigation() {
                 RecipeScreen()
             }
 
-            storageGraph<Destination.StorageScreen>(navController)
+            storageGraph(navController)
+        }
+    }
+}
+
+private fun NavGraphBuilder.storageGraph(controller: NavController) {
+    navigation<Destination.StorageScreen>(
+        startDestination = Storage.Main,
+    ) {
+        composable<Storage.Main> {
+            StorageScreen(onCreationRequested = { controller.navigate(Storage.Creation) })
+        }
+        composable<Storage.Creation> {
+            CreationScreen(
+                finishCreation = { controller.popBackStack() }
+            )
         }
     }
 }

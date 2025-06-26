@@ -39,6 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import hu.tb.core.domain.meal.Category
 import hu.tb.presentation.components.CategoryItem
 import hu.tb.presentation.components.PlusButton
 import hu.tb.presentation.theme.AppTheme
@@ -131,7 +132,7 @@ private fun StorageScreen(
                                 translationX = groupItemShakeValue.value
                             },
                         deleteIconPadding = DELETE_ICON_OFFSET_DP,
-                        title = item,
+                        title = item.name,
                         count = 4,
                         onGroupItemClick = { action(StorageAction.OnCategoryClick) },
                         onEditGroupClick = {
@@ -199,7 +200,9 @@ private fun StorageScreenPreview() {
 
     val mockState = StorageState(
         categories = listOf(
-            "meet", "fruit", "milk"
+            Category("meal"),
+            Category("fruit"),
+            Category("milk"),
         ),
         foods = listOf(
             "apple", "banana", "lemon"

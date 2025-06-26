@@ -32,3 +32,8 @@ val destinations =
         Destination.RecipeScreen(),
         Destination.StorageScreen()
     )
+
+sealed interface Storage {
+    @Serializable object Main
+    @Serializable object Creation
+}
