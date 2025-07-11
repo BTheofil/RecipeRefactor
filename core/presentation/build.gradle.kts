@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace = "hu.tb.presentation"
-    compileSdk = 35
+    compileSdk = libs.versions.compileSdkVersion.get().toInt()
 
     defaultConfig {
-        minSdk = 26
+        minSdk = libs.versions.minSdkVersion.get().toInt()
 
         consumerProguardFiles("consumer-rules.pro")
     }
