@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -30,44 +31,47 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import hu.tb.core.domain.meal.Category
 import hu.tb.presentation.components.CategoryItem
 import hu.tb.presentation.components.PlusButton
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
-private val DELETE_ICON_OFFSET_DP = 8.dp
-
 @Composable
 fun StorageScreen(
     viewModel: StorageViewModel = koinViewModel(),
     onCreationRequested: () -> Unit
 ) {
-    val lifeCycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(viewModel.event, lifeCycleOwner) {
-        lifeCycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.event.collect { event ->
-                when (event) {
-                    is StorageEvent.NavigateToCreation -> onCreationRequested()
-                }
-            }
-        }
-    }
-
     StorageScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
-        action = viewModel::onAction
+        action = { action ->
+            when (action) {
+                StorageAction.OnAddFoodClick -> {
+                    viewModel.onAction(action)
+                    onCreationRequested()
+                }
+
+                else -> viewModel::onAction
+            }
+        }
     )
 }
+
+private val DELETE_ICON_OFFSET_DP = 8.dp
+private val GROUP_ITEM_DEFAULT_HEIGHT = 60.dp
+private const val SHAKE_EFFECT_MIN = -2f
+private const val SHAKE_EFFECT_MAX = 2f
 
 @Composable
 private fun StorageScreen(
@@ -75,16 +79,16 @@ private fun StorageScreen(
     action: (StorageAction) -> Unit
 ) {
     val density = LocalDensity.current
-    var groupItemHeightDp by remember { mutableStateOf(88.dp) }
+    var groupItemHeightDp by remember { mutableStateOf(GROUP_ITEM_DEFAULT_HEIGHT) }
 
     var isGroupDeleteActive by remember { mutableStateOf(false) }
 
-    val groupItemShakeValue = remember { Animatable(-2f) }
+    val groupItemShakeValue = remember { Animatable(SHAKE_EFFECT_MIN) }
 
     LaunchedEffect(isGroupDeleteActive) {
         if (isGroupDeleteActive) {
             groupItemShakeValue.animateTo(
-                targetValue = 2f,
+                targetValue = SHAKE_EFFECT_MAX,
                 animationSpec = infiniteRepeatable(
                     animation = tween(
                         easing = LinearEasing
@@ -94,6 +98,8 @@ private fun StorageScreen(
             )
         }
     }
+
+    val scroll = rememberLazyGridState()
 
     Scaffold(
         modifier = Modifier
@@ -115,10 +121,23 @@ private fun StorageScreen(
             )
             LazyVerticalGrid(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                columns = GridCells.Fixed(2),
+                    .fillMaxWidth()
+                    .weight(weight = 1f, fill = false)
+                    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                    .drawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                0.9f to Color.White,
+                                1f to Color.Transparent
+                            ),
+                            blendMode = BlendMode.DstIn
+                        )
+                    },
+                state = scroll,
+                columns = GridCells.Fixed(3),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 itemsIndexed(
                     items = state.categories
@@ -161,7 +180,8 @@ private fun StorageScreen(
             Spacer(Modifier.height(8.dp))
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
