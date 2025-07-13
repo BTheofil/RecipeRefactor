@@ -126,13 +126,24 @@ private fun StorageScreen(
                     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
                     .drawWithContent {
                         drawContent()
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                0.9f to Color.White,
-                                1f to Color.Transparent
-                            ),
-                            blendMode = BlendMode.DstIn
-                        )
+                        if (scroll.canScrollForward) {
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    0.9f to Color.White,
+                                    1f to Color.Transparent,
+                                ),
+                                blendMode = BlendMode.DstIn
+                            )
+                        }
+                        if(scroll.canScrollBackward) {
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    0f to Color.Transparent,
+                                    0.1f to Color.White,
+                                ),
+                                blendMode = BlendMode.DstIn
+                            )
+                        }
                     },
                 state = scroll,
                 columns = GridCells.Fixed(3),
