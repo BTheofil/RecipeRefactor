@@ -3,8 +3,8 @@ package hu.tb.database.repository
 import hu.tb.core.domain.meal.Food
 import hu.tb.core.domain.meal.FoodRepository
 import hu.tb.database.dao.FoodDao
-import hu.tb.database.mapper.toDomain
-import hu.tb.database.mapper.toEntity
+import hu.tb.database.entity.toDomain
+import hu.tb.database.entity.toEntity
 
 class FoodRepositoryImpl(
     private val dao: FoodDao

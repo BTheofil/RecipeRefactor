@@ -2,6 +2,7 @@ package hu.tb.core.domain.meal
 
 data class Food(
     val name: String,
-    val category: Category,
-    val quantity: Int
+    val category: FoodCategory,
+    val quantity: Int,
+    val measure: Measure
 )

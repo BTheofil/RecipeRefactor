@@ -57,11 +57,7 @@ fun StorageScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
         action = { action ->
             when (action) {
-                StorageAction.OnAddFoodClick -> {
-                    viewModel.onAction(action)
-                    onCreationRequested()
-                }
-
+                StorageAction.OnAddFoodClick -> onCreationRequested()
                 else -> viewModel::onAction
             }
         }

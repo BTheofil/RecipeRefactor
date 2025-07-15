@@ -2,7 +2,6 @@ package hu.tb.presentation.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import hu.tb.core.domain.meal.Category
 import hu.tb.core.domain.meal.Food
 import hu.tb.core.domain.meal.FoodRepository
 import kotlinx.coroutines.launch
@@ -14,15 +13,17 @@ class CreationViewModel(
     fun onAction(action: CreationAction) {
         when (action) {
             is CreationAction.OnDoneClick -> viewModelScope.launch {
-                foodRepository.insert(
+
+                val food = action.run {
                     Food(
-                        name = action.productText,
-                        category = Category(
-                            name = "a"
-                        ),
-                        quantity = 1
+                        name = productText,
+                        category = selectedCategory,
+                        quantity = quantity,
+                        measure = measure
                     )
-                )
+                }
+
+                foodRepository.insert(food)
             }
         }
     }
