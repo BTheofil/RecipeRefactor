@@ -68,9 +68,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(projects.core.data)
-    implementation(projects.core.database)
     implementation(projects.core.presentation)
-    implementation(projects.shopping.presentation)
+    implementation(projects.shop.presentation)
     implementation(projects.recipe.presentation)
-    implementation(projects.storage.presentation)
+    implementation(projects.depo.presentation)
 }

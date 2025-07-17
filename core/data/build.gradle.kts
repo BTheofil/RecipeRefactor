@@ -4,11 +4,17 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     kotlin("plugin.serialization") version libs.versions.kotlin
+    alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
     namespace = "hu.tb.core.data"
     compileSdk = libs.versions.compileSdkVersion.get().toInt()
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 
     defaultConfig {
         minSdk = libs.versions.minSdkVersion.get().toInt()
@@ -46,6 +52,10 @@ dependencies {
     implementation(libs.ktor.logging)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.json)
+
+    ksp(libs.room)
+    implementation(libs.room.runtime)
+    implementation(libs.room.coroutines)
 
     implementation(libs.koin)
 
