@@ -1,8 +1,7 @@
 package hu.tb.core.data.di
 
 import androidx.room.Room
-import hu.tb.core.data.database.ProductDatabase
-import hu.tb.core.data.database.ShoppingDatabase
+import hu.tb.core.data.database.ApplicationDatabase
 import hu.tb.core.data.database.repository.ProductRepositoryImpl
 import hu.tb.core.data.database.repository.ShopItemRepositoryImpl
 import hu.tb.core.data.network.KtorClient
@@ -21,24 +20,14 @@ val dataModule = module {
     single {
         Room.databaseBuilder(
             androidApplication(),
-            ShoppingDatabase::class.java,
-            "shopping.db"
+            ApplicationDatabase::class.java,
+            "application.db"
         ).build()
     }
 
-    single { get<ShoppingDatabase>().shoppingDao() }
+    single { get<ApplicationDatabase>().shopDao() }
+    single { get<ApplicationDatabase>().productDao() }
 
     singleOf(::ShopItemRepositoryImpl).bind<ShopItemRepository>()
-
-    single {
-        Room.databaseBuilder(
-            androidApplication(),
-            ProductDatabase::class.java,
-            "food.db"
-        ).build()
-    }
-
-    single { get<ProductDatabase>().foodDao() }
-
     singleOf(::ProductRepositoryImpl).bind<ProductRepository>()
 }
