@@ -12,7 +12,7 @@ class ShopItemRepositoryImpl(
     private val dao: ShopDao
 ) : ShopItemRepository {
 
-    override suspend fun saveItem(item: ShopItem) =
+    override suspend fun saveItem(item: ShopItem): Long =
         dao.insert(item.toEntity())
 
     override suspend fun deleteItem(item: ShopItem) =

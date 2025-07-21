@@ -1,13 +1,11 @@
 package hu.tb.core.data.network
 
-import hu.tb.core.domain.util.NetworkError
-import hu.tb.core.domain.util.Result
+import hu.tb.core.domain.network.NetworkError
+import hu.tb.core.domain.network.Result
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.SerializationException
-
-const val BASE_URL = "https://www.themealdb.com/api/json/v1/1"
 
 suspend inline fun <reified T> handleNetworkCall(
     execute: () -> HttpResponse

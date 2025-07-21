@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ShopItemRepository {
 
-    suspend fun saveItem(item: ShopItem)
+    suspend fun saveItem(item: ShopItem): Long
 
     suspend fun deleteItem(item: ShopItem)
 

@@ -1,4 +1,4 @@
-package hu.tb.core.domain.util
+package hu.tb.core.domain.network
 
 enum class NetworkError {
     NO_INTERNET,

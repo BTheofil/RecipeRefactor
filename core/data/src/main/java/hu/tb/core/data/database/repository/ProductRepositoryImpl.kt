@@ -10,7 +10,7 @@ class ProductRepositoryImpl(
     private val dao: ProductDao
 ) : ProductRepository {
 
-    override suspend fun insert(product: Product) =
+    override suspend fun insert(product: Product): Long =
         dao.insert(product.toEntity())
 
     override suspend fun delete(product: Product) =
