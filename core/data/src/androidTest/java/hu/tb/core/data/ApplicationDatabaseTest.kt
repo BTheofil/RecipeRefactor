@@ -54,7 +54,7 @@ class ApplicationDatabaseTest {
         shopDao.insert(mockShopItem)
 
         val item = shopDao.getAll().first().find { it.id == 1L }
-        assertThat(item!!.name).matches(mockShopItem.name)
+        assertThat(item!!.name).isEqualTo(mockShopItem.name)
         assertThat(item.isChecked).isFalse()
 
         val mockShopItem2 = ShopItemEntity(
@@ -69,7 +69,7 @@ class ApplicationDatabaseTest {
 
         val item2 = items.find { it.id == 1L }
         assertThat(item2!!.name).matches(mockShopItem.name)
-        assertThat(item.isChecked).isFalse()
+        assertThat(item2.isChecked).isFalse()
 
         val firstEntity = shopDao.getAll().first().first()
         shopDao.delete(firstEntity)
@@ -81,6 +81,7 @@ class ApplicationDatabaseTest {
             isChecked = false
         )
         shopDao.insert(updateItem2)
-        assertThat(shopDao.getAll().first().first().id).isEqualTo(2)
+        assertThat(shopDao.getAll().first().first().name).isEqualTo(updateItem2.name)
+        assertThat(shopDao.getAll().first().first().isChecked).isFalse()
     }
 }
