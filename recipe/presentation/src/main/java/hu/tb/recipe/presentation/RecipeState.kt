@@ -1,18 +1,13 @@
 package hu.tb.recipe.presentation
 
-import hu.tb.core.domain.meal.Category
-import hu.tb.core.domain.meal.FilterMeal
-import hu.tb.core.domain.meal.Meal
+import hu.tb.core.domain.recipe.Recipe
 
 data class RecipeState(
-    val meals: List<Meal> = emptyList(),
+    val recipes: List<Recipe> = emptyList(),
     val isMealsLoading: Boolean = false,
     val isErrorOccurred: Boolean = false,
-    val categories: List<Category> = emptyList(),
     val isCategoriesLoading: Boolean = false,
     val isCategoryFailed: Boolean = false,
     val searchField: String = "",
-    val selectedFilter: Category = Category("Beef"),
-    val filterMeals: List<FilterMeal> = emptyList(),
     val isFilterMealLoading: Boolean = false
 )
