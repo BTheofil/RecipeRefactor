@@ -438,7 +438,7 @@ private fun ClearItemsDialogPreview() {
 @Preview
 @Composable
 private fun ShoppingScreenPreview() {
-    val mockList1 = listOf<ShopItem>(
+    val mockList1 = listOf(
         ShopItem(
             1, "test", false
         ),
@@ -446,7 +446,7 @@ private fun ShoppingScreenPreview() {
             2, "test", false
         )
     )
-    val mockList2 = listOf<ShopItem>(
+    val mockList2 = listOf(
         ShopItem(
             3, "test", true
         ),

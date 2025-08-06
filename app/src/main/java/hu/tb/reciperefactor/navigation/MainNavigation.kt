@@ -24,6 +24,7 @@ import androidx.navigation.navigation
 import hu.tb.presentation.create.CreationScreen
 import hu.tb.presentation.storage.StorageScreen
 import hu.tb.recipe.presentation.RecipeScreen
+import hu.tb.recipe.presentation.create.CreateScreen
 import hu.tb.shopping.presentation.ShoppingScreen
 
 @Composable
@@ -83,9 +84,7 @@ fun MainNavigation() {
                 ShoppingScreen()
             }
 
-            composable<Destination.RecipeScreen> {
-                RecipeScreen()
-            }
+            recipeGraph(navController)
 
             storageGraph(navController)
         }
@@ -103,6 +102,22 @@ private fun NavGraphBuilder.storageGraph(controller: NavController) {
             CreationScreen(
                 finishCreation = { controller.popBackStack() }
             )
+        }
+    }
+}
+
+private fun NavGraphBuilder.recipeGraph(controller: NavController) {
+    navigation<Destination.RecipeScreen>(
+        startDestination = Recipe.Main
+    ) {
+        composable<Recipe.Main> {
+            RecipeScreen(
+                onCreateRecipeClick = { controller.navigate(Recipe.Creation) }
+            )
+        }
+
+        composable<Recipe.Creation> {
+            CreateScreen()
         }
     }
 }
