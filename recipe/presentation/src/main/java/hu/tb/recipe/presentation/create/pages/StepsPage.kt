@@ -1,13 +1,14 @@
 package hu.tb.recipe.presentation.create.pages
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
@@ -22,19 +23,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.recipe.presentation.create.CreateAction
 
 @Composable
-fun StepsPage() {
-
-    var editedText by remember {
-        mutableStateOf("")
-    }
+fun StepsPage(
+    stepList: List<String>,
+    onAction: (CreateAction.StepsAction) -> Unit
+) {
+    val focusManger = LocalFocusManager.current
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .clickable(
+                interactionSource = null,
+                indication = null,
+                onClick = { focusManger.clearFocus() }
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
@@ -47,20 +56,27 @@ fun StepsPage() {
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                BasicTextField(
+            stepList.forEach { step ->
+                var editedText by remember {
+                    mutableStateOf("")
+                }
+
+                ElevatedCard(
                     modifier = Modifier
-                        .width(IntrinsicSize.Max)
-                        .height(IntrinsicSize.Max),
-                    value = editedText,
-                    onValueChange = { editedText = it }
-                )
+                        .fillMaxWidth()
+                ) {
+                    BasicTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        value = editedText,
+                        onValueChange = { editedText = it }
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
             }
             OutlinedButton(
-                onClick = {},
+                onClick = { onAction(CreateAction.StepsAction.OnAddStep) },
                 content = {
                     Text(
                         text = "Add step",
@@ -71,7 +87,7 @@ fun StepsPage() {
             )
         }
         Button(
-            onClick = {},
+            onClick = { onAction(CreateAction.StepsAction.OnDone) },
             content = {
                 Text(
                     text = "Done",
@@ -87,6 +103,9 @@ fun StepsPage() {
 @Composable
 private fun StepsPagePreview() {
     AppTheme {
-        StepsPage()
+        StepsPage(
+            stepList = listOf(""),
+            onAction = {}
+        )
     }
 }

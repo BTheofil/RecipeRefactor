@@ -1,5 +1,6 @@
 package hu.tb.recipe.presentation.create
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -36,6 +37,14 @@ private fun CreateScreen(
 
     val scope = rememberCoroutineScope()
 
+    BackHandler(
+        enabled = pagerState.currentPage != 0
+    ) {
+        scope.launch {
+            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+        }
+    }
+
     HorizontalPager(
         state = pagerState,
         pageContent = { index ->
@@ -66,7 +75,10 @@ private fun CreateScreen(
                     }
                 )
 
-                2 -> StepsPage()
+                2 -> StepsPage(
+                    stepList = state.steps,
+                    onAction = { onAction(it) }
+                )
             }
         }
     )

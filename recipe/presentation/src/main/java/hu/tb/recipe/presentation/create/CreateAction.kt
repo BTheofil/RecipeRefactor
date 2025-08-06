@@ -14,4 +14,9 @@ sealed interface CreateAction {
         data class OnAddIngredients(val product: Product) : IngredientsAction
         data class OnRemoveIngredient(val productIndex: Int) : IngredientsAction
     }
+
+    sealed interface StepsAction: CreateAction {
+        data object OnDone: StepsAction
+        data object OnAddStep: StepsAction
+    }
 }
