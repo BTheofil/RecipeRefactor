@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.RecipeRepository
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -15,6 +17,9 @@ class CreateViewModel(
 
     private val _state = MutableStateFlow(CreationState())
     val state = _state.asStateFlow()
+
+    private val _event = Channel<CreationEvent>()
+    val event = _event.receiveAsFlow()
 
     fun onAction(action: CreateAction) {
         when (action) {
@@ -56,7 +61,9 @@ class CreateViewModel(
                             howToMakeSteps = state.value.steps
                         )
                     )
-                    println(recipeId)
+                    if (recipeId > -1) {
+                        _event.send(CreationEvent.RecipeSaved)
+                    }
                 }
             }
 

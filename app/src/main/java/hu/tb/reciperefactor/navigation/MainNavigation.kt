@@ -1,10 +1,12 @@
 package hu.tb.reciperefactor.navigation
 
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,6 +39,7 @@ fun MainNavigation() {
             .fillMaxSize(),
         bottomBar = {
             NavigationBar(
+                windowInsets = NavigationBarDefaults.windowInsets,
                 content = {
                     destinations.forEach { destination ->
                         NavigationBarItem(
@@ -76,6 +79,7 @@ fun MainNavigation() {
     ) { innerPadding ->
         NavHost(
             modifier = Modifier
+                .consumeWindowInsets(innerPadding)
                 .padding(innerPadding),
             navController = navController,
             startDestination = selectedDestination
@@ -117,7 +121,9 @@ private fun NavGraphBuilder.recipeGraph(controller: NavController) {
         }
 
         composable<Recipe.Creation> {
-            CreateScreen()
+            CreateScreen(
+                navigateBack = { controller.popBackStack() }
+            )
         }
     }
 }

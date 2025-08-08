@@ -4,9 +4,13 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.recipe.presentation.create.pages.IngredientsPage
 import hu.tb.recipe.presentation.create.pages.StarterPage
@@ -16,8 +20,20 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateScreen(
-    viewModel: CreateViewModel = koinViewModel()
+    viewModel: CreateViewModel = koinViewModel(),
+    navigateBack: () -> Unit
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel.event, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.event.collect { event ->
+                if (event is CreationEvent.RecipeSaved) {
+                    navigateBack()
+                }
+            }
+        }
+    }
+
     CreateScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
         onAction = viewModel::onAction
@@ -88,6 +104,9 @@ private fun CreateScreen(
 @Composable
 private fun CreateScreenPreview() {
     AppTheme {
-        CreateScreen()
+        CreateScreen(
+            state = CreationState(),
+            onAction = {}
+        )
     }
 }
