@@ -19,6 +19,7 @@ class RecipeViewModel() : ViewModel() {
                         searchField = action.text
                     )
                 }
+            else -> {}
 
         }
 }

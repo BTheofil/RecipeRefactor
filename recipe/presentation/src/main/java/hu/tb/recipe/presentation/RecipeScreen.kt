@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
@@ -28,10 +29,16 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun RecipeScreen(
     viewModel: RecipeViewModel = koinViewModel(),
+    onCreateRecipeClick: () -> Unit,
 ) {
     RecipeScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
-        onAction = viewModel::onAction,
+        onAction = {
+            when(it) {
+                is RecipeAction.OnCreateRecipeClick -> onCreateRecipeClick()
+                else -> viewModel::onAction
+            }
+        },
     )
 }
 
@@ -58,6 +65,15 @@ fun RecipeScreen(
             color = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.height(8.dp))
+        Button(
+            onClick = { onAction(RecipeAction.OnCreateRecipeClick) }
+        ) {
+            Text(
+                text = "create recipe",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
     }
 }
 

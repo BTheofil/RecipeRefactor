@@ -37,3 +37,8 @@ sealed interface Storage {
     @Serializable object Main
     @Serializable object Creation
 }
+
+sealed interface Recipe {
+    @Serializable object Main
+    @Serializable object Creation
+}
