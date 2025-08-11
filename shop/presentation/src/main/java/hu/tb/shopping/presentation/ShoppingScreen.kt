@@ -20,26 +20,29 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,9 +53,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.shop.ShopItem
+import hu.tb.presentation.components.ProductCreation
 import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -71,25 +77,17 @@ fun ShoppingScreen(
     state: ShoppingState,
     onAction: (ShoppingAction) -> Unit
 ) {
-    var isCreateDialogVisible by remember {
-        mutableStateOf(false)
-    }
+    var isDeleteDialogVisible by remember { mutableStateOf(false) }
+    var isSingleDeleteDialogVisible by remember { mutableStateOf(false) }
+    var isMenuOpen by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf<ShopItem?>(null) }
 
-    var isDeleteDialogVisible by remember {
-        mutableStateOf(false)
-    }
-
-    var isSingleDeleteDialogVisible by remember {
-        mutableStateOf(false)
-    }
-
-    var selectedItem by remember {
-        mutableStateOf<ShopItem?>(null)
-    }
+    val sheetState = rememberBottomSheetScaffoldState()
+    val scope = rememberCoroutineScope()
 
     val focusManager = LocalFocusManager.current
 
-    Scaffold(
+    BottomSheetScaffold(
         modifier = Modifier
             .clickable(
                 onClick = {
@@ -108,142 +106,138 @@ fun ShoppingScreen(
                     )
                 },
                 actions = {
-                    IconButton(
-                        modifier = Modifier,
-                        onClick = { isDeleteDialogVisible = true }
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
                     ) {
-                        Icon(
-                            Icons.Outlined.Delete,
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                            contentDescription = "clear icon"
+                        IconButton(
+                            onClick = { isMenuOpen = true },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Outlined.MoreVert,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = "menu icon",
+                                )
+                            }
+                        )
+                        DropdownMenu(
+                            expanded = isMenuOpen,
+                            onDismissRequest = { isMenuOpen = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Add item") },
+                                onClick = {
+                                    scope.launch {
+                                        sheetState.bottomSheetState.expand()
+                                    }
+                                    isMenuOpen = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Clear the board") },
+                                onClick = { isDeleteDialogVisible = true }
+                            )
+                        }
+                    }
+                }
+            )
+        },
+        sheetContent = {
+            ProductCreation(
+                onProductCreated = { onAction(ShoppingAction.SaveItem(it)) }
+            )
+        },
+        scaffoldState = sheetState,
+        sheetPeekHeight = 0.dp,
+        content = { innerPadding ->
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(top = 8.dp)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (state.uncheckedItems.isEmpty()) {
+                    item {
+                        ShoppingEmptyScreen()
+                    }
+                } else {
+                    items(
+                        items = state.uncheckedItems,
+                        key = { it -> it.id ?: it.hashCode() }
+                    ) { item ->
+                        ItemContainer(
+                            modifier = Modifier
+                                .animateItem(),
+                            item = item,
+                            onTextChange = { newText ->
+                                onAction(ShoppingAction.ShopItemChange(item.copy(name = newText)))
+                            },
+                            onCheckClick = { isChecked ->
+                                onAction(ShoppingAction.ShopItemChange(item.copy(isChecked = isChecked)))
+                            }
                         )
                     }
-                },
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { isCreateDialogVisible = true },
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    contentDescription = "FAB add icon"
-                )
-            }
-        },
-    ) { scaffoldPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(scaffoldPadding)
-                .fillMaxSize()
-                .padding(top = 8.dp)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (state.uncheckedItems.isEmpty()) {
-                item {
-                    ShoppingEmptyScreen()
                 }
-            } else {
-                items(
-                    items = state.uncheckedItems,
-                    key = { it -> it.id ?: it.hashCode() }
-                ) { item ->
-                    ItemContainer(
-                        modifier = Modifier
-                            .animateItem(),
-                        item = item,
-                        onTextChange = { newText ->
-                            onAction(
-                                ShoppingAction.OnEditItemChange(
-                                    item.copy(name = newText)
-                                )
-                            )
-                        },
-                        onCheckClick = { isChecked ->
-                            onAction(
-                                ShoppingAction.OnItemCheckChange(
-                                    item.copy(isChecked = isChecked)
-                                )
-                            )
-                        }
-                    )
-                }
-            }
-            if (state.checkedItems.isNotEmpty()) {
-                item {
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                items(
-                    items = state.checkedItems,
-                    key = { it -> it.id ?: it.hashCode() }
-                ) { item ->
-                    ItemContainer(
-                        modifier = Modifier
-                            .animateItem()
-                            .combinedClickable(
-                                onClick = {},
-                                onLongClick = {
-                                    isSingleDeleteDialogVisible = true
-                                    selectedItem = item
-                                },
-                                onLongClickLabel = "appear single delete dialog",
-                                interactionSource = null,
-                                indication = null
-                            ),
-                        item = item,
-                        onTextChange = {},
-                        onCheckClick = { isChecked ->
-                            onAction(
-                                ShoppingAction.OnItemCheckChange(
-                                    item.copy(isChecked = isChecked)
-                                )
-                            )
-                        }
-                    )
-                }
-            }
-        }
-
-        if (isCreateDialogVisible) {
-            CreateShoppingItemDialog(
-                onSaveButton = {
-                    onAction(
-                        ShoppingAction.OnCreateDialogSaveButtonClick(
-                            ShopItem(
-                                name = it
-                            )
+                if (state.checkedItems.isNotEmpty()) {
+                    item {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.primary
                         )
-                    )
-                },
-                onDismissRequest = { isCreateDialogVisible = false }
-            )
-        }
-
-        if (isDeleteDialogVisible) {
-            ClearItemsDialog(
-                onDeleteButton = { onAction(ShoppingAction.OnClearButtonClick) },
-                onDismissRequest = { isDeleteDialogVisible = false }
-            )
-        }
-
-        if (isSingleDeleteDialogVisible) {
-            DeleteSingleItemDialog(
-                onDeleteButton = {
-                    selectedItem?.let { onAction(ShoppingAction.OnDeleteSingleButtonClick(it)) }
-                    selectedItem = null
-                    isSingleDeleteDialogVisible = false
-                },
-                onDismissRequest = {
-                    isSingleDeleteDialogVisible = false
-                    selectedItem = null
+                    }
+                    items(
+                        items = state.checkedItems,
+                        key = { it -> it.id ?: it.hashCode() }
+                    ) { item ->
+                        ItemContainer(
+                            modifier = Modifier
+                                .animateItem()
+                                .combinedClickable(
+                                    onClick = {},
+                                    onLongClick = {
+                                        isSingleDeleteDialogVisible = true
+                                        selectedItem = item
+                                    },
+                                    onLongClickLabel = "appear single delete dialog",
+                                    interactionSource = null,
+                                    indication = null
+                                ),
+                            item = item,
+                            onTextChange = {},
+                            onCheckClick = { isChecked ->
+                                onAction(
+                                    ShoppingAction.ShopItemChange(
+                                        item.copy(isChecked = isChecked)
+                                    )
+                                )
+                            }
+                        )
+                    }
                 }
-            )
+            }
         }
+    )
+
+    if (isDeleteDialogVisible) {
+        ClearItemsDialog(
+            onDeleteButton = { onAction(ShoppingAction.OnClearButtonClick) },
+            onDismissRequest = { isDeleteDialogVisible = false }
+        )
+    }
+
+    if (isSingleDeleteDialogVisible) {
+        DeleteSingleItemDialog(
+            onDeleteButton = {
+                selectedItem?.let { onAction(ShoppingAction.OnDeleteSingleButtonClick(it)) }
+                selectedItem = null
+                isSingleDeleteDialogVisible = false
+            },
+            onDismissRequest = {
+                isSingleDeleteDialogVisible = false
+                selectedItem = null
+            }
+        )
     }
 }
 
@@ -438,22 +432,24 @@ private fun ClearItemsDialogPreview() {
 @Preview
 @Composable
 private fun ShoppingScreenPreview() {
-    val mockList1 = listOf(
+    val mockList1 = List(2) { i ->
         ShopItem(
-            1, "test", false
-        ),
-        ShopItem(
-            2, "test", false
+            id = i.toLong(),
+            name = "$i name",
+            quantity = 2,
+            measure = Measure.PIECE,
+            isChecked = false
         )
-    )
-    val mockList2 = listOf(
+    }
+    val mockList2 = List(2) { i ->
         ShopItem(
-            3, "test", true
-        ),
-        ShopItem(
-            4, "test", true
+            id = i.toLong(),
+            name = "$i name",
+            quantity = 2,
+            measure = Measure.PIECE,
+            isChecked = false
         )
-    )
+    }
 
     AppTheme {
         ShoppingScreen(

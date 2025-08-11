@@ -1,8 +1,7 @@
 package hu.tb.core.data.database.repository
 
 import hu.tb.core.data.database.dao.ShopDao
-import hu.tb.core.data.database.entity.toDomain
-import hu.tb.core.data.database.entity.toEntity
+import hu.tb.core.data.database.entity.ProductEntity
 import hu.tb.core.domain.shop.ShopItem
 import hu.tb.core.domain.shop.ShopItemRepository
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +19,23 @@ class ShopItemRepositoryImpl(
 
     override fun getAllItem(): Flow<List<ShopItem>> =
         dao.getAll().map { items ->
-            items.map { it.toDomain() }
+            items.map { it.toShopDomain() }
         }
 }
+
+private fun ShopItem.toEntity(): ProductEntity = ProductEntity(
+    productId = id,
+    name = name,
+    quantity = quantity,
+    measure = measure,
+    isChecked = isChecked,
+    isDraft = true
+)
+
+private fun ProductEntity.toShopDomain(): ShopItem = ShopItem(
+    id = productId,
+    name = name,
+    quantity = quantity,
+    measure = measure,
+    isChecked = isChecked
+)

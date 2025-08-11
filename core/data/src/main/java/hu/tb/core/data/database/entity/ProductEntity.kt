@@ -22,7 +22,9 @@ data class ProductEntity(
     val name: String,
     val quantity: Int,
     val measure: Measure,
-    val recipeIdConnection: Long? = null
+    val isDraft: Boolean, //for the shopping items, also the isChecked
+    val recipeIdConnection: Long? = null,
+    val isChecked: Boolean = false
 )
 
 fun ProductEntity.toDomain(): Product =
@@ -37,7 +39,8 @@ fun Product.toEntity(recipeConnectionId: Long? = null): ProductEntity =
         name = name,
         quantity = quantity,
         measure = measure,
-        recipeIdConnection = recipeConnectionId
+        recipeIdConnection = recipeConnectionId,
+        isDraft = false,
     )
 
 

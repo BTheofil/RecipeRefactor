@@ -6,14 +6,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.test.espresso.Espresso
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.shopping.presentation.ShoppingAction
 import hu.tb.shopping.presentation.ShoppingScreen
 import hu.tb.shopping.presentation.ShoppingState
+import kotlinx.coroutines.delay
 import org.junit.Rule
 import org.junit.Test
 
@@ -33,15 +36,9 @@ class ShoppingScreenTest {
                     onAction = {
                         when (it) {
                             ShoppingAction.OnClearButtonClick -> {}
-                            is ShoppingAction.OnCreateDialogSaveButtonClick -> {
-                                mockState = mockState.copy(
-                                    uncheckedItems = listOf(it.newItem)
-                                )
-                            }
-
                             is ShoppingAction.OnDeleteSingleButtonClick -> {}
-                            is ShoppingAction.OnEditItemChange -> {}
-                            is ShoppingAction.OnItemCheckChange -> {}
+                            is ShoppingAction.SaveItem -> {}
+                            is ShoppingAction.ShopItemChange -> TODO()
                         }
                     }
                 )
@@ -51,13 +48,17 @@ class ShoppingScreenTest {
         //check title
         composeRule.onNodeWithText("Shopping list").assertIsDisplayed()
 
+        composeRule.onNode(hasContentDescription("menu icon")).performClick()
+        composeRule.onNodeWithText("Add item").assertIsDisplayed()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithText("Ingredient name").performTextInput("apple")
+        composeRule.onNodeWithText("Amount").performTextInput("1")
         composeRule.onNode(
-            hasContentDescription("FAB add icon").and(hasClickAction())
+            hasTestTag("DropdownMenuIconTag").and(hasClickAction())
         ).performClick()
-        composeRule.onNodeWithText("Create new item").assertIsDisplayed()
-        composeRule.onNodeWithText("New item name").performTextInput("first")
-        composeRule.onNodeWithText("Add").performClick()
-        composeRule.onNodeWithText("first").assertIsDisplayed()
+        composeRule.onNodeWithText("PIECE").performClick()
+        Espresso.closeSoftKeyboard()
+        composeRule.onNodeWithText("Add ingredient").assertIsDisplayed()
     }
 
 }
