@@ -1,4 +1,4 @@
-package hu.tb.recipe.presentation.create.components
+package hu.tb.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,18 +24,20 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.core.domain.product.Measure
+import hu.tb.presentation.theme.AppTheme
 
 @Composable
 fun <T> TextFieldWithDropdownMenu(
     modifier: Modifier = Modifier,
-    textFieldValue: T,
-    labelFieldText: String,
+    selectedItem: String,
+    labelText: String,
     menuItemList: List<T>,
     onMenuItemClick: (T) -> Unit,
+    itemToDisplay: (T) -> String
 ) {
     var isDropdownMenuVisible by rememberSaveable { mutableStateOf(false) }
     var itemWidth by remember { mutableStateOf(0.dp) }
+
     val density = LocalDensity.current
 
     Box(
@@ -47,12 +49,12 @@ fun <T> TextFieldWithDropdownMenu(
                 .onSizeChanged {
                     itemWidth = with(density) { it.width.toDp() }
                 },
-            value = textFieldValue as String,
+            value = selectedItem,
             onValueChange = {},
             readOnly = true,
             label = {
                 Text(
-                    text = labelFieldText,
+                    text = labelText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -74,38 +76,39 @@ fun <T> TextFieldWithDropdownMenu(
             modifier = Modifier
                 .width(itemWidth),
             expanded = isDropdownMenuVisible,
-            onDismissRequest = { isDropdownMenuVisible = false }) {
-            menuItemList.forEach {
-                DropdownMenuItem(
-                    text = { Text(text = convertGeneric(it)) },
-                    onClick = {
-                        onMenuItemClick(it)
-                        isDropdownMenuVisible = false
-                    })
+            onDismissRequest = { isDropdownMenuVisible = false },
+            content = {
+                menuItemList.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(itemToDisplay(item)) },
+                        onClick = {
+                            onMenuItemClick(item)
+                            isDropdownMenuVisible = false
+                        }
+                    )
+                }
             }
-        }
+        )
     }
-}
-
-private fun <T> convertGeneric(input: T): String {
-    if (input is Measure) {
-        return input.name
-    }
-    return ""
 }
 
 @Preview
 @Composable
 private fun TextFieldWithDropdownMenuPreview() {
 
+    val mockList = listOf("one", "two", "three")
+
     var selected by remember {
-        mutableStateOf(Measure.PIECE)
+        mutableStateOf(mockList.first())
     }
 
-    TextFieldWithDropdownMenu(
-        textFieldValue = selected,
-        labelFieldText = "Measurement",
-        menuItemList = Measure.entries,
-        onMenuItemClick = { selected = it }
-    )
+    AppTheme {
+        TextFieldWithDropdownMenu(
+            selectedItem = selected,
+            labelText = "Measurement",
+            menuItemList = mockList,
+            onMenuItemClick = { selected = it },
+            itemToDisplay = { it }
+        )
+    }
 }
