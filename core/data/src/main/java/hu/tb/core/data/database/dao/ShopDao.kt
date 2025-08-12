@@ -8,6 +8,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ShopDao : BaseDao<ProductEntity> {
 
-    @Query("SELECT * FROM productentity WHERE isDraft = 1")
+    @Query("SELECT * FROM productentity WHERE isChecked IS NOT NULL")
     fun getAll(): Flow<List<ProductEntity>>
 }

@@ -29,7 +29,6 @@ private fun ShopItem.toEntity(): ProductEntity = ProductEntity(
     quantity = quantity,
     measure = measure,
     isChecked = isChecked,
-    isDraft = true
 )
 
 private fun ProductEntity.toShopDomain(): ShopItem = ShopItem(
@@ -37,5 +36,5 @@ private fun ProductEntity.toShopDomain(): ShopItem = ShopItem(
     name = name,
     quantity = quantity,
     measure = measure,
-    isChecked = isChecked
+    isChecked = isChecked ?: false
 )
