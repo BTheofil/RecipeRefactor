@@ -61,9 +61,7 @@ fun ShoppingScreen(
     BottomSheetScaffold(
         modifier = Modifier
             .clickable(
-                onClick = {
-                    focusManager.clearFocus()
-                },
+                onClick = { focusManager.clearFocus() },
                 interactionSource = null,
                 indication = null
             ),
