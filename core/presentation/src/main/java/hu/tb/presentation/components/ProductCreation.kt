@@ -25,16 +25,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.product.Measure
-import hu.tb.core.domain.product.Product
+import hu.tb.core.domain.product.ProductCreation
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
 fun ProductCreation(
-    onProductCreated: (Product) -> Unit
+    prefillItem: ProductCreation? = null,
+    onProductCreated: (ProductCreation) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf("") }
-    var measure by remember { mutableStateOf(Measure.PIECE) }
+    var name by remember(prefillItem) { mutableStateOf(prefillItem?.name ?: "") }
+    var quantity by remember(prefillItem) {
+        mutableStateOf(
+            prefillItem?.quantity?.toString() ?: ""
+        )
+    }
+    var measure by remember(prefillItem) { mutableStateOf(prefillItem?.measure ?: Measure.PIECE) }
 
     val focusManager = LocalFocusManager.current
 
@@ -97,7 +102,8 @@ fun ProductCreation(
             onClick = {
                 focusManager.clearFocus()
                 onProductCreated(
-                    Product(
+                    ProductCreation(
+                        id = prefillItem?.id,
                         name = name,
                         quantity = quantity.toInt(),
                         measure = measure

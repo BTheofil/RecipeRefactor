@@ -16,7 +16,6 @@ import hu.tb.presentation.theme.AppTheme
 import hu.tb.shopping.presentation.ShoppingAction
 import hu.tb.shopping.presentation.ShoppingScreen
 import hu.tb.shopping.presentation.ShoppingState
-import kotlinx.coroutines.delay
 import org.junit.Rule
 import org.junit.Test
 
@@ -35,9 +34,8 @@ class ShoppingScreenTest {
                     state = mockState,
                     onAction = {
                         when (it) {
-                            ShoppingAction.OnClearButtonClick -> {}
-                            is ShoppingAction.OnDeleteSingleButtonClick -> {}
-                            is ShoppingAction.SaveItem -> {}
+                            ShoppingAction.DeleteAllItems -> {}
+                            is ShoppingAction.DeleteItem -> {}
                             is ShoppingAction.ShopItemChange -> TODO()
                         }
                     }

@@ -16,7 +16,8 @@ sealed interface CreateAction {
     }
 
     sealed interface StepsAction: CreateAction {
-        data object OnDone: StepsAction
-        data object OnAddStep: StepsAction
+        data object AddStepField: StepsAction
+        data object FinishSteps: StepsAction
+        data class StepFieldChange(val index: Int, val text: String): StepsAction
     }
 }

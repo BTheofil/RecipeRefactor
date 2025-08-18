@@ -2,7 +2,6 @@ package hu.tb.shopping.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.shop.ShopItem
 import hu.tb.core.domain.shop.ShopItemRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,10 +33,9 @@ class ShoppingViewModel(
 
     fun onAction(action: ShoppingAction) {
         when (action) {
-            ShoppingAction.OnClearButtonClick -> deleteAllItems()
-            is ShoppingAction.SaveItem -> saveNewItem(action.product)
+            ShoppingAction.DeleteAllItems -> deleteAllItems()
             is ShoppingAction.ShopItemChange -> saveItemChanges(action.shopItem)
-            is ShoppingAction.OnDeleteSingleButtonClick -> deleteItem(action.item)
+            is ShoppingAction.DeleteItem -> deleteItem(action.item)
         }
     }
 
@@ -47,19 +45,6 @@ class ShoppingViewModel(
         }
         state.value.uncheckedItems.forEach { item ->
             repository.deleteItem(item)
-        }
-    }
-
-    private fun saveNewItem(product: Product) {
-        val temp = product.run {
-            ShopItem(
-                name = name,
-                quantity = quantity,
-                measure = measure
-            )
-        }
-        viewModelScope.launch {
-            repository.saveItem(temp)
         }
     }
 

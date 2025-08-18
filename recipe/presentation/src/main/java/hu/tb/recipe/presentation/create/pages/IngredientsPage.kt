@@ -97,7 +97,7 @@ fun IngredientsCreatePanel(
 ) {
     Column {
         ProductCreation(
-            onProductCreated = { onAction(CreateAction.IngredientsAction.OnAddIngredients(it)) }
+            onProductCreated = { onAction(CreateAction.IngredientsAction.OnAddIngredients(it.toProduct())) }
         )
         OutlinedButton(
             modifier = Modifier

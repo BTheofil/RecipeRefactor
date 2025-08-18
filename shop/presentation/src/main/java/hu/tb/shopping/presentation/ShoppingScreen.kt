@@ -28,7 +28,6 @@ import hu.tb.core.domain.shop.ShopItem
 import hu.tb.presentation.components.ProductCreation
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.shopping.presentation.components.ShoppingDeleteDialog
-import hu.tb.shopping.presentation.components.ShoppingEmptyScreen
 import hu.tb.shopping.presentation.components.ShoppingItem
 import hu.tb.shopping.presentation.components.ShoppingTopBar
 import hu.tb.shopping.presentation.components.ShoppingTopBarAction
@@ -52,6 +51,7 @@ fun ShoppingScreen(
     onAction: (ShoppingAction) -> Unit
 ) {
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
+    var editedItem by remember { mutableStateOf<ShopItem?>(null) }
 
     val sheetState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
@@ -82,7 +82,11 @@ fun ShoppingScreen(
         },
         sheetContent = {
             ProductCreation(
-                onProductCreated = { onAction(ShoppingAction.SaveItem(it)) }
+                prefillItem = editedItem?.toProductCreation(),
+                onProductCreated = {
+                    onAction(ShoppingAction.ShopItemChange(it.toShopItem()))
+                    editedItem = null
+                }
             )
         },
         scaffoldState = sheetState,
@@ -95,24 +99,25 @@ fun ShoppingScreen(
                     .padding(top = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (state.uncheckedItems.isEmpty()) {
-                    item {
-                        ShoppingEmptyScreen()
-                    }
-                } else {
-                    items(
-                        items = state.uncheckedItems,
-                        key = { it -> it.id ?: it.hashCode() }
-                    ) { item ->
-                        ShoppingItem(
-                            modifier = Modifier
-                                .animateItem(),
-                            item = item,
-                            onCheckClick = { isChecked ->
-                                onAction(ShoppingAction.ShopItemChange(item.copy(isChecked = isChecked)))
+                items(
+                    items = state.uncheckedItems,
+                    key = { it -> it.id ?: it.hashCode() }
+                ) { item ->
+                    ShoppingItem(
+                        modifier = Modifier
+                            .animateItem(),
+                        item = item,
+                        onCheckClick = { isChecked ->
+                            onAction(ShoppingAction.ShopItemChange(item.copy(isChecked = isChecked)))
+                        },
+                        onDeleteClick = { onAction(ShoppingAction.DeleteItem(item)) },
+                        onEditClick = {
+                            scope.launch {
+                                editedItem = item
+                                sheetState.bottomSheetState.expand()
                             }
-                        )
-                    }
+                        }
+                    )
                 }
                 if (state.checkedItems.isNotEmpty()) {
                     item {
@@ -137,7 +142,7 @@ fun ShoppingScreen(
                                         item.copy(isChecked = isChecked)
                                     )
                                 )
-                            }
+                            },
                         )
                     }
                 }
@@ -147,7 +152,7 @@ fun ShoppingScreen(
 
     if (isDeleteDialogVisible) {
         ShoppingDeleteDialog(
-            onDeleteButton = { onAction(ShoppingAction.OnClearButtonClick) },
+            onDeleteButton = { onAction(ShoppingAction.DeleteAllItems) },
             onDismissRequest = { isDeleteDialogVisible = false }
         )
     }

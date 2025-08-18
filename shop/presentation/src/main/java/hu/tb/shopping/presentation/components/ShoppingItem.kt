@@ -1,18 +1,23 @@
 package hu.tb.shopping.presentation.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedCard
@@ -23,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,8 +36,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,32 +55,67 @@ import kotlin.math.roundToInt
 fun ShoppingItem(
     modifier: Modifier = Modifier,
     item: ShopItem,
-    onCheckClick: (Boolean) -> Unit
+    onCheckClick: (Boolean) -> Unit,
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     var offset by remember { mutableStateOf(Animatable(0f)) }
     var actionComponentSize by remember { mutableFloatStateOf(0f) }
+    var cardHeight by remember { mutableStateOf(0.dp) }
+    var itemTextLineCount by remember { mutableIntStateOf(0) }
 
     val scope = rememberCoroutineScope()
 
-    Box {
+    val localDensity = LocalDensity.current
+
+    Box(
+        modifier = modifier
+    ) {
         Row(
             modifier = Modifier
+                .then(if (item.isChecked) Modifier.alpha(0f) else Modifier.alpha(1f))
+                .height(IntrinsicSize.Max)
                 .onSizeChanged {
                     actionComponentSize = it.width.toFloat()
                 }
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 14.dp,
+                        bottomStart = 14.dp,
+                    )
+                )
+                .height(cardHeight),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = {}
-            ) {
-                Icon(Icons.Default.ShoppingCart, "")
-            }
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                onClick = onEditClick,
+                content = {
+                    Icon(Icons.Outlined.Edit, "edit icon")
+                }
+            )
+            IconButton(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.error),
+                onClick = onDeleteClick,
+                content = {
+                    Icon(Icons.Outlined.Delete, "delete icon")
+                }
+            )
         }
         ElevatedCard(
-            modifier = modifier
+            modifier = Modifier
+                .onSizeChanged {
+                    cardHeight = with(localDensity) { it.height.toDp() }
+                }
                 .offset { IntOffset(offset.value.roundToInt(), 0) }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { _, dragAmount ->
+                            if (item.isChecked) return@detectHorizontalDragGestures
                             scope.launch {
                                 val newOffset =
                                     (offset.value + dragAmount).coerceIn(0f, actionComponentSize)
@@ -117,11 +160,15 @@ fun ShoppingItem(
                             color = MaterialTheme.colorScheme.primary,
                             textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None
                         ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    onTextLayout = {
+                        itemTextLineCount = it.lineCount
+                    }
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
+                    modifier = Modifier
+                        .then(if (itemTextLineCount > 1) Modifier.align(Alignment.Top) else Modifier),
                     text = item.quantity.toString() + " " + item.measure,
                     style = MaterialTheme.typography.bodyMedium
                         .copy(
@@ -153,12 +200,16 @@ private fun ShoppingItemPreview() {
         ) {
             ShoppingItem(
                 item = mockItem,
-                onCheckClick = {}
+                onCheckClick = {},
+                onEditClick = {},
+                onDeleteClick = {}
             )
             Spacer(Modifier.height(16.dp))
             ShoppingItem(
                 item = mockItem.copy(isChecked = false),
-                onCheckClick = {}
+                onCheckClick = {},
+                onEditClick = {},
+                onDeleteClick = {}
             )
         }
     }

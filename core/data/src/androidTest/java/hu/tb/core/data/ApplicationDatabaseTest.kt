@@ -8,7 +8,8 @@ import hu.tb.core.data.database.ApplicationDatabase
 import hu.tb.core.data.database.dao.ProductDao
 import hu.tb.core.data.database.dao.RecipeDao
 import hu.tb.core.data.database.dao.ShopDao
-import hu.tb.core.data.database.entity.ShopItemEntity
+import hu.tb.core.data.database.entity.ProductEntity
+import hu.tb.core.domain.product.Measure
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.IOException
@@ -46,20 +47,24 @@ class ApplicationDatabaseTest {
 
     @Test
     fun shopDao_CRUD() = runBlocking {
-        val mockShopItem = ShopItemEntity(
+        val mockShopItem = ProductEntity(
             name = "first",
-            isChecked = false
+            isChecked = false,
+            quantity = 1,
+            measure = Measure.PIECE
         )
 
         shopDao.insert(mockShopItem)
 
-        val item = shopDao.getAll().first().find { it.id == 1L }
+        val item = shopDao.getAll().first().find { it.productId == 1L }
         assertThat(item!!.name).isEqualTo(mockShopItem.name)
         assertThat(item.isChecked).isFalse()
 
-        val mockShopItem2 = ShopItemEntity(
+        val mockShopItem2 = ProductEntity(
             name = "second",
-            isChecked = true
+            isChecked = true,
+            quantity = 1,
+            measure = Measure.PIECE
         )
 
         shopDao.insert(mockShopItem2)
@@ -67,7 +72,7 @@ class ApplicationDatabaseTest {
         val items = shopDao.getAll().first()
         assertThat(items).hasSize(2)
 
-        val item2 = items.find { it.id == 1L }
+        val item2 = items.find { it.productId == 1L }
         assertThat(item2!!.name).matches(mockShopItem.name)
         assertThat(item2.isChecked).isFalse()
 
