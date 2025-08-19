@@ -89,7 +89,7 @@ fun ProductCreation(
                 modifier = Modifier
                     .weight(1f),
                 labelText = "Measurement",
-                selectedItem = enumToString(measure),
+                selectedItem = measure.toDisplay,
                 menuItemList = Measure.entries,
                 onMenuItemClick = { measure = it },
                 itemToDisplay = { it.name }
@@ -105,7 +105,7 @@ fun ProductCreation(
                     ProductCreation(
                         id = prefillItem?.id,
                         name = name,
-                        quantity = quantity.toInt(),
+                        quantity = quantity.toDouble(),
                         measure = measure
                     )
                 )
@@ -116,14 +116,6 @@ fun ProductCreation(
         }
     }
 }
-
-private fun enumToString(measure: Measure): String =
-    when (measure) {
-        Measure.GRAM -> "gram"
-        Measure.DAG -> "dag"
-        Measure.KG -> "kg"
-        Measure.PIECE -> "piece"
-    }
 
 @Preview
 @Composable

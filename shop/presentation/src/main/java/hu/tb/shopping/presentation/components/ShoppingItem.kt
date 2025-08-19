@@ -188,7 +188,7 @@ private fun ShoppingItemPreview() {
     val mockItem = ShopItem(
         id = 1L,
         name = "testing",
-        quantity = 1,
+        quantity = 1.0,
         measure = Measure.PIECE,
         isChecked = true
     )

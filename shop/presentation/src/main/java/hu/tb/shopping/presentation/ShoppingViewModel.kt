@@ -36,6 +36,7 @@ class ShoppingViewModel(
             ShoppingAction.DeleteAllItems -> deleteAllItems()
             is ShoppingAction.ShopItemChange -> saveItemChanges(action.shopItem)
             is ShoppingAction.DeleteItem -> deleteItem(action.item)
+            ShoppingAction.AddAllItemsToStorage -> addShoppingItemsToDepo()
         }
     }
 
@@ -54,5 +55,9 @@ class ShoppingViewModel(
 
     private fun deleteItem(item: ShopItem) = viewModelScope.launch {
         repository.deleteItem(item)
+    }
+
+    private fun addShoppingItemsToDepo() = viewModelScope.launch {
+        repository.addShoppingItemsToDepo(state.value.checkedItems)
     }
 }

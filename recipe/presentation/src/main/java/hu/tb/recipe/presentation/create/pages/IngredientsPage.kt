@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.presentation.components.ProductCreation
 import hu.tb.presentation.theme.AppTheme
@@ -61,7 +60,7 @@ fun IngredientsPage(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = enumToString(product.measure),
+                                    text = product.measure.toDisplay,
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.secondary
                                 )
@@ -112,14 +111,6 @@ fun IngredientsCreatePanel(
         }
     }
 }
-
-private fun enumToString(measure: Measure): String =
-    when (measure) {
-        Measure.GRAM -> "gram"
-        Measure.DAG -> "dag"
-        Measure.KG -> "kg"
-        Measure.PIECE -> "piece"
-    }
 
 @Preview
 @Composable

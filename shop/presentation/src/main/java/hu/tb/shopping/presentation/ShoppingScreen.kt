@@ -13,6 +13,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,8 @@ import hu.tb.core.domain.shop.ShopItem
 import hu.tb.presentation.components.ProductCreation
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.shopping.presentation.components.ShoppingDeleteDialog
+import hu.tb.shopping.presentation.components.ShoppingEmptyScreen
+import hu.tb.shopping.presentation.components.ShoppingFinishDialog
 import hu.tb.shopping.presentation.components.ShoppingItem
 import hu.tb.shopping.presentation.components.ShoppingTopBar
 import hu.tb.shopping.presentation.components.ShoppingTopBarAction
@@ -51,12 +54,19 @@ fun ShoppingScreen(
     onAction: (ShoppingAction) -> Unit
 ) {
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
+    var isFinishDialogVisible by remember { mutableStateOf(false) }
     var editedItem by remember { mutableStateOf<ShopItem?>(null) }
 
     val sheetState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
 
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(state.uncheckedItems, state.checkedItems) {
+        if (state.uncheckedItems.isEmpty() && state.checkedItems.isNotEmpty()) {
+            isFinishDialogVisible = true
+        }
+    }
 
     BottomSheetScaffold(
         modifier = Modifier
@@ -99,6 +109,11 @@ fun ShoppingScreen(
                     .padding(top = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                if (state.checkedItems.isEmpty() && state.uncheckedItems.isEmpty()) {
+                    item {
+                        ShoppingEmptyScreen()
+                    }
+                }
                 items(
                     items = state.uncheckedItems,
                     key = { it -> it.id ?: it.hashCode() }
@@ -152,8 +167,21 @@ fun ShoppingScreen(
 
     if (isDeleteDialogVisible) {
         ShoppingDeleteDialog(
-            onDeleteButton = { onAction(ShoppingAction.DeleteAllItems) },
+            onDeleteButton = {
+                onAction(ShoppingAction.DeleteAllItems)
+                isDeleteDialogVisible = false
+            },
             onDismissRequest = { isDeleteDialogVisible = false }
+        )
+    }
+
+    if (isFinishDialogVisible) {
+        ShoppingFinishDialog(
+            onAddItemsClick = {
+                onAction(ShoppingAction.AddAllItemsToStorage)
+                isFinishDialogVisible = false
+            },
+            onDismissRequest = { isFinishDialogVisible = false }
         )
     }
 }
@@ -165,7 +193,7 @@ private fun ShoppingScreenPreview() {
         ShopItem(
             id = i.toLong(),
             name = "$i name",
-            quantity = 2,
+            quantity = 2.0,
             measure = Measure.PIECE,
             isChecked = false
         )
@@ -174,7 +202,7 @@ private fun ShoppingScreenPreview() {
         ShopItem(
             id = (i + 2).toLong(),
             name = "$i name",
-            quantity = 2,
+            quantity = 2.0,
             measure = Measure.PIECE,
             isChecked = false
         )

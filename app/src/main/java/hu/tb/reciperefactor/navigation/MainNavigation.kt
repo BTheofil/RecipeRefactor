@@ -23,7 +23,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import hu.tb.presentation.create.CreationScreen
 import hu.tb.presentation.storage.StorageScreen
 import hu.tb.recipe.presentation.RecipeScreen
 import hu.tb.recipe.presentation.create.CreateScreen
@@ -103,9 +102,7 @@ private fun NavGraphBuilder.storageGraph(controller: NavController) {
             StorageScreen(onCreationRequested = { controller.navigate(Storage.Creation) })
         }
         composable<Storage.Creation> {
-            CreationScreen(
-                finishCreation = { controller.popBackStack() }
-            )
+            //todo
         }
     }
 }

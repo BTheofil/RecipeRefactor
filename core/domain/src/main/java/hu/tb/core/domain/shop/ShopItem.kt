@@ -6,7 +6,7 @@ import hu.tb.core.domain.product.ProductCreation
 data class ShopItem(
     val id: Long? = null,
     val name: String,
-    val quantity: Int,
+    val quantity: Double,
     val measure: Measure,
     val isChecked: Boolean = false
 ) {

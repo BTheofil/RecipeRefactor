@@ -1,7 +1,7 @@
 package hu.tb.shopping.presentation.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,34 +10,34 @@ import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
-fun ShoppingDeleteDialog(
-    onDeleteButton: () -> Unit,
+fun ShoppingFinishDialog(
+    onAddItemsClick: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
     SimpleDialog(
-        icon = Icons.Outlined.Delete,
-        title = "Clear items",
+        icon = Icons.Outlined.CheckCircle,
+        title = "Adding all bought items",
         content = {
             Text(
-                text = "This action will permanently delete all written items.\n" +
-                        "Are you sure you want to proceed?",
+                text = "This action will all bought items to the storage.\n" +
+                        "Are you want to proceed?",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
         },
-        positiveButtonText = "Delete",
+        positiveButtonText = "Add",
         negativeButtonText = "Cancel",
-        onPositiveClick = onDeleteButton,
+        onPositiveClick = onAddItemsClick,
         onDismissRequest = onDismissRequest
     )
 }
 
 @Preview
 @Composable
-private fun ShoppingDeleteDialogPreview() {
+private fun ShoppingFinishDialogPreview() {
     AppTheme {
-        ShoppingDeleteDialog(
-            onDeleteButton = {},
+        ShoppingFinishDialog(
+            onAddItemsClick = {},
             onDismissRequest = {}
         )
     }

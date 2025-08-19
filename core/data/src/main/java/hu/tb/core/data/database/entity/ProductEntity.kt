@@ -20,7 +20,7 @@ data class ProductEntity(
     @PrimaryKey(autoGenerate = true)
     val productId: Long? = null,
     val name: String,
-    val quantity: Int,
+    val quantity: Double,
     val measure: Measure,
     val recipeIdConnection: Long? = null,
     val isChecked: Boolean? = null //null means is for the shopping
