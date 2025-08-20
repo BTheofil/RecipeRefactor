@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.tb.core.domain.shop.ShopItem
 import hu.tb.core.domain.shop.ShopItemRepository
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -15,6 +18,9 @@ class ShoppingViewModel(
 
     private val _state = MutableStateFlow(ShoppingState())
     val state = _state.asStateFlow()
+
+    private val _event = Channel<ShoppingEvent>()
+    val event = _event.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -51,6 +57,12 @@ class ShoppingViewModel(
 
     private fun saveItemChanges(item: ShopItem) = viewModelScope.launch {
         repository.saveItem(item)
+        val currentItems = repository.getAllItem().first()
+        val completed = currentItems.any { it.isChecked }
+        val uncompleted = currentItems.none { !it.isChecked }
+        if (uncompleted && completed) {
+            _event.send(ShoppingEvent.ShowShoppingFinishedDialog)
+        }
     }
 
     private fun deleteItem(item: ShopItem) = viewModelScope.launch {
@@ -59,5 +71,6 @@ class ShoppingViewModel(
 
     private fun addShoppingItemsToDepo() = viewModelScope.launch {
         repository.addShoppingItemsToDepo(state.value.checkedItems)
+        deleteAllItems()
     }
 }

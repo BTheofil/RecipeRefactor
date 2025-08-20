@@ -41,10 +41,31 @@ import org.koin.androidx.compose.koinViewModel
 fun ShoppingScreen(
     viewModel: ShoppingViewModel = koinViewModel()
 ) {
+    var isFinishDialogVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            if (event is ShoppingEvent.ShowShoppingFinishedDialog) {
+                isFinishDialogVisible = true
+            }
+
+        }
+    }
+
     ShoppingScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
         onAction = viewModel::onAction
     )
+
+    if (isFinishDialogVisible) {
+        ShoppingFinishDialog(
+            onAddItemsClick = {
+                viewModel.onAction(ShoppingAction.AddAllItemsToStorage)
+                isFinishDialogVisible = false
+            },
+            onDismissRequest = { isFinishDialogVisible = false }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -54,19 +75,12 @@ fun ShoppingScreen(
     onAction: (ShoppingAction) -> Unit
 ) {
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
-    var isFinishDialogVisible by remember { mutableStateOf(false) }
     var editedItem by remember { mutableStateOf<ShopItem?>(null) }
 
     val sheetState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
 
     val focusManager = LocalFocusManager.current
-
-    LaunchedEffect(state.uncheckedItems, state.checkedItems) {
-        if (state.uncheckedItems.isEmpty() && state.checkedItems.isNotEmpty()) {
-            isFinishDialogVisible = true
-        }
-    }
 
     BottomSheetScaffold(
         modifier = Modifier
@@ -172,16 +186,6 @@ fun ShoppingScreen(
                 isDeleteDialogVisible = false
             },
             onDismissRequest = { isDeleteDialogVisible = false }
-        )
-    }
-
-    if (isFinishDialogVisible) {
-        ShoppingFinishDialog(
-            onAddItemsClick = {
-                onAction(ShoppingAction.AddAllItemsToStorage)
-                isFinishDialogVisible = false
-            },
-            onDismissRequest = { isFinishDialogVisible = false }
         )
     }
 }
