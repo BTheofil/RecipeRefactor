@@ -48,7 +48,6 @@ fun ShoppingScreen(
             if (event is ShoppingEvent.ShowShoppingFinishedDialog) {
                 isFinishDialogVisible = true
             }
-
         }
     }
 
@@ -91,6 +90,7 @@ fun ShoppingScreen(
             ),
         topBar = {
             ShoppingTopBar(
+                isShoppingFinished = state.checkedItems.isNotEmpty() && state.uncheckedItems.isEmpty(),
                 onAction = { action ->
                     when (action) {
                         ShoppingTopBarAction.AddShoppingItem -> scope.launch {
@@ -100,6 +100,8 @@ fun ShoppingScreen(
                         ShoppingTopBarAction.ClearBoard -> {
                             isDeleteDialogVisible = true
                         }
+
+                        ShoppingTopBarAction.ShoppingFinished -> onAction(ShoppingAction.AddAllItemsToStorage)
                     }
                 }
             )

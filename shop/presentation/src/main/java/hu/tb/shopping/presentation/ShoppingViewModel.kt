@@ -57,12 +57,7 @@ class ShoppingViewModel(
 
     private fun saveItemChanges(item: ShopItem) = viewModelScope.launch {
         repository.saveItem(item)
-        val currentItems = repository.getAllItem().first()
-        val completed = currentItems.any { it.isChecked }
-        val uncompleted = currentItems.none { !it.isChecked }
-        if (uncompleted && completed) {
-            _event.send(ShoppingEvent.ShowShoppingFinishedDialog)
-        }
+        checkShoppingIsFinished()
     }
 
     private fun deleteItem(item: ShopItem) = viewModelScope.launch {
@@ -72,5 +67,14 @@ class ShoppingViewModel(
     private fun addShoppingItemsToDepo() = viewModelScope.launch {
         repository.addShoppingItemsToDepo(state.value.checkedItems)
         deleteAllItems()
+    }
+
+    private suspend fun checkShoppingIsFinished() {
+        val currentItems = repository.getAllItem().first()
+        val completed = currentItems.any { it.isChecked }
+        val uncompleted = currentItems.none { !it.isChecked }
+        if (uncompleted && completed) {
+            _event.send(ShoppingEvent.ShowShoppingFinishedDialog)
+        }
     }
 }

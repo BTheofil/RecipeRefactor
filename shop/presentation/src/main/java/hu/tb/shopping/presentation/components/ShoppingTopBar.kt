@@ -23,11 +23,13 @@ import androidx.compose.ui.unit.dp
 sealed interface ShoppingTopBarAction {
     data object AddShoppingItem : ShoppingTopBarAction
     data object ClearBoard : ShoppingTopBarAction
+    data object ShoppingFinished : ShoppingTopBarAction
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingTopBar(
+    isShoppingFinished: Boolean,
     onAction: (ShoppingTopBarAction) -> Unit
 ) {
     var isMenuOpen by remember { mutableStateOf(false) }
@@ -73,6 +75,15 @@ fun ShoppingTopBar(
                             isMenuOpen = false
                         }
                     )
+                    if(isShoppingFinished) {
+                        DropdownMenuItem(
+                            text = { Text("Finish shopping") },
+                            onClick = {
+                                onAction(ShoppingTopBarAction.ShoppingFinished)
+                                isMenuOpen = false
+                            }
+                        )
+                    }
                 }
             }
         }
