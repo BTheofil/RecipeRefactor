@@ -41,6 +41,8 @@ fun ProductCreation(
         )
     }
     var measure by remember(prefillItem) { mutableStateOf(prefillItem?.measure ?: Measure.PIECE) }
+    var isNameError by remember { mutableStateOf(false) }
+    var isQuantityError by remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
@@ -59,6 +61,7 @@ fun ProductCreation(
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            isError = isNameError
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(
@@ -86,7 +89,8 @@ fun ProductCreation(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = { focusManager.clearFocus() }
-                )
+                ),
+                isError = isQuantityError
             )
             Spacer(modifier = Modifier.width(16.dp))
             TextFieldWithDropdownMenu(
@@ -105,16 +109,25 @@ fun ProductCreation(
                 .fillMaxWidth(),
             onClick = {
                 focusManager.clearFocus()
-                onProductCreated(
-                    ProductCreation(
-                        id = prefillItem?.id,
-                        name = name,
-                        quantity = quantity.toDouble(),
-                        measure = measure
+                try {
+                    require(name.isNotEmpty())
+                    isNameError = false
+                    require(quantity.isNotEmpty())
+                    isQuantityError = false
+                    onProductCreated(
+                        ProductCreation(
+                            id = prefillItem?.id,
+                            name = name,
+                            quantity = quantity.toDouble(),
+                            measure = measure
+                        )
                     )
-                )
-                name = ""
-                quantity = ""
+                    name = ""
+                    quantity = ""
+                } catch (_: Exception) {
+                    if (name.isEmpty()) isNameError = true
+                    isQuantityError = quantity.isEmpty()
+                }
             }) {
             Text(text = "Add ingredient")
         }
