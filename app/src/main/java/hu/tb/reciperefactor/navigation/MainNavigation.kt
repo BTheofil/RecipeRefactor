@@ -23,16 +23,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import hu.tb.presentation.create.CreationScreen
 import hu.tb.presentation.storage.StorageScreen
 import hu.tb.recipe.presentation.RecipeScreen
 import hu.tb.recipe.presentation.create.CreateScreen
-import hu.tb.shopping.presentation.ShoppingScreen
+import hu.tb.shopping.presentation.ShopScreen
 
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
-    var selectedDestination by remember { mutableStateOf<Destination>(Destination.RecipeScreen()) }
+    var selectedDestination by remember { mutableStateOf<Destination>(Destination.ShoppingScreen()) }
 
     Scaffold(
         modifier = Modifier
@@ -85,7 +84,7 @@ fun MainNavigation() {
             startDestination = selectedDestination
         ) {
             composable<Destination.ShoppingScreen> {
-                ShoppingScreen()
+                ShopScreen()
             }
 
             recipeGraph(navController)
@@ -103,9 +102,7 @@ private fun NavGraphBuilder.storageGraph(controller: NavController) {
             StorageScreen(onCreationRequested = { controller.navigate(Storage.Creation) })
         }
         composable<Storage.Creation> {
-            CreationScreen(
-                finishCreation = { controller.popBackStack() }
-            )
+            //todo
         }
     }
 }

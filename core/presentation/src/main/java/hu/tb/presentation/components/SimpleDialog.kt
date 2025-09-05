@@ -31,9 +31,9 @@ fun SimpleDialog(
     icon: ImageVector? = null,
     title: String,
     content: @Composable () -> Unit,
-    positiveTitleButton: String,
-    onPositiveButton: () -> Unit,
-    negativeTitleButton: String,
+    positiveButtonText: String,
+    onPositiveClick: () -> Unit,
+    negativeButtonText: String,
     onDismissRequest: () -> Unit
 ) = Dialog(
     onDismissRequest = onDismissRequest
@@ -73,7 +73,7 @@ fun SimpleDialog(
                     onClick = onDismissRequest,
                     content = {
                         Text(
-                            text = negativeTitleButton,
+                            text = negativeButtonText,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -81,10 +81,13 @@ fun SimpleDialog(
                 )
                 Spacer(Modifier.width(16.dp))
                 TextButton(
-                    onClick = onPositiveButton,
+                    onClick = {
+                        onPositiveClick()
+                        onDismissRequest()
+                    },
                     content = {
                         Text(
-                            text = positiveTitleButton,
+                            text = positiveButtonText,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -105,9 +108,9 @@ private fun DialogPreview() {
             content = {
                 Text("Dialog content")
             },
-            positiveTitleButton = "Add",
-            onPositiveButton = {},
-            negativeTitleButton = "Cancel",
+            positiveButtonText = "Add",
+            onPositiveClick = {},
+            negativeButtonText = "Cancel",
             onDismissRequest = {}
         )
     }

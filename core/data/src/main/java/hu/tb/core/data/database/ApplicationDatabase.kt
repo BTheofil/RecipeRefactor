@@ -9,12 +9,10 @@ import hu.tb.core.data.database.dao.ShopDao
 import hu.tb.core.data.database.entity.ProductEntity
 import hu.tb.core.data.database.entity.ProductMeasureConverter
 import hu.tb.core.data.database.entity.RecipeEntity
-import hu.tb.core.data.database.entity.ShopItemEntity
 import hu.tb.core.data.database.entity.StepEntity
 
 @Database(
     entities = [
-        ShopItemEntity::class,
         ProductEntity::class,
         RecipeEntity::class,
         StepEntity::class

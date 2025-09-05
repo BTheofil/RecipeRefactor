@@ -11,11 +11,8 @@ class ProductMeasureConverter {
 
     @TypeConverter
     fun intToUnit(index: Int): Measure =
-        when(index){
-            0 -> Measure.PIECE
-            1 -> Measure.GRAM
-            2 -> Measure.DAG
-            3 -> Measure.KG
+        when (index) {
+            index -> Measure.entries[index]
             else -> throw Exception()
         }
 }

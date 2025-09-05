@@ -46,13 +46,21 @@ class CreateViewModel(
                 )
             }
 
-            is CreateAction.StepsAction.OnAddStep -> _state.update {
+            is CreateAction.StepsAction.StepFieldChange -> _state.update {
+                it.copy(
+                    steps = state.value.steps.toMutableList().apply {
+                        this[action.index] = action.text
+                    }
+                )
+            }
+
+            is CreateAction.StepsAction.AddStepField -> _state.update {
                 it.copy(
                     steps = state.value.steps.toMutableList() + ""
                 )
             }
 
-            is CreateAction.StepsAction.OnDone -> {
+            is CreateAction.StepsAction.FinishSteps -> {
                 viewModelScope.launch {
                     val recipeId = recipeRepository.save(
                         recipe = Recipe(

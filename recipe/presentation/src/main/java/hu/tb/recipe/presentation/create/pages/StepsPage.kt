@@ -17,10 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -56,11 +52,7 @@ fun StepsPage(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            stepList.forEach { step ->
-                var editedText by remember {
-                    mutableStateOf("")
-                }
-
+            stepList.forEachIndexed { index, step ->
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -69,14 +61,21 @@ fun StepsPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        value = editedText,
-                        onValueChange = { editedText = it }
+                        value = step,
+                        onValueChange = {
+                            onAction(
+                                CreateAction.StepsAction.StepFieldChange(
+                                    index = index,
+                                    text = it
+                                )
+                            )
+                        }
                     )
                 }
                 Spacer(Modifier.height(16.dp))
             }
             OutlinedButton(
-                onClick = { onAction(CreateAction.StepsAction.OnAddStep) },
+                onClick = { onAction(CreateAction.StepsAction.AddStepField) },
                 content = {
                     Text(
                         text = "Add step",
@@ -87,7 +86,7 @@ fun StepsPage(
             )
         }
         Button(
-            onClick = { onAction(CreateAction.StepsAction.OnDone) },
+            onClick = { onAction(CreateAction.StepsAction.FinishSteps) },
             content = {
                 Text(
                     text = "Done",
