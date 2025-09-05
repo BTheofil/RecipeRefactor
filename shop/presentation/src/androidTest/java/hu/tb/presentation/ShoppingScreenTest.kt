@@ -5,17 +5,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso
+import hu.tb.core.domain.product.Measure
+import hu.tb.core.domain.shop.ShopItem
 import hu.tb.presentation.theme.AppTheme
-import hu.tb.shopping.presentation.ShoppingAction
-import hu.tb.shopping.presentation.ShoppingScreen
-import hu.tb.shopping.presentation.ShoppingState
+import hu.tb.shopping.presentation.ShopAction
+import hu.tb.shopping.presentation.ShopScreen
+import hu.tb.shopping.presentation.ShopState
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,37 +28,45 @@ class ShoppingScreenTest {
 
     @Test
     fun testShoppingScreen_itemsVisible() {
-        var mockState by mutableStateOf(ShoppingState())
+        var mockState by mutableStateOf(ShopState())
+
+        val testItem = ShopItem(1, "apple", 1.0, Measure.PIECE)
 
         composeRule.setContent {
             AppTheme {
-                ShoppingScreen(
+                ShopScreen(
                     state = mockState,
                     onAction = {
                         when (it) {
-                            ShoppingAction.DeleteAllItems -> {}
-                            is ShoppingAction.DeleteItem -> {}
-                            is ShoppingAction.ShopItemChange -> TODO()
+                            ShopAction.DeleteAllItems -> {}
+                            is ShopAction.DeleteItem -> {}
+                            is ShopAction.ShopItemChange -> {
+                                mockState = mockState.copy(
+                                    uncheckedItems = listOf(testItem)
+                                )
+                            }
+                            ShopAction.AddAllItemsToStorage -> {}
                         }
                     }
                 )
             }
         }
 
-        //check title
         composeRule.onNodeWithText("Shopping list").assertIsDisplayed()
 
-        composeRule.onNode(hasContentDescription("menu icon")).performClick()
-        composeRule.onNodeWithText("Add item").assertIsDisplayed()
+        composeRule.onNodeWithText("Create new item").assertIsDisplayed().performClick()
         composeRule.waitForIdle()
-        composeRule.onNodeWithText("Ingredient name").performTextInput("apple")
-        composeRule.onNodeWithText("Amount").performTextInput("1")
+        composeRule.onNodeWithText("Ingredient name").performTextInput(testItem.name)
+        composeRule.onNodeWithText("Amount").performTextInput(testItem.quantity.toString())
         composeRule.onNode(
             hasTestTag("DropdownMenuIconTag").and(hasClickAction())
         ).performClick()
         composeRule.onNodeWithText("PIECE").performClick()
         Espresso.closeSoftKeyboard()
-        composeRule.onNodeWithText("Add ingredient").assertIsDisplayed()
+        composeRule.onNodeWithText("Add ingredient").assertIsDisplayed().performClick()
+        composeRule.onNodeWithTag("closeIcon").performClick()
+
+        composeRule.onNodeWithText(testItem.name).assertIsDisplayed()
     }
 
 }

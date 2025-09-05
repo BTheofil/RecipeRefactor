@@ -31,6 +31,7 @@ import hu.tb.presentation.theme.AppTheme
 
 @Composable
 fun ProductCreation(
+    modifier: Modifier = Modifier,
     prefillItem: ProductCreation? = null,
     onProductCreated: (ProductCreation) -> Unit
 ) {
@@ -46,7 +47,9 @@ fun ProductCreation(
 
     val focusManager = LocalFocusManager.current
 
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(),

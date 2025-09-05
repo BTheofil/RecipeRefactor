@@ -10,7 +10,7 @@ import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
-fun ShoppingDeleteDialog(
+fun ShopDeleteDialog(
     onDeleteButton: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -36,7 +36,7 @@ fun ShoppingDeleteDialog(
 @Composable
 private fun ShoppingDeleteDialogPreview() {
     AppTheme {
-        ShoppingDeleteDialog(
+        ShopDeleteDialog(
             onDeleteButton = {},
             onDismissRequest = {}
         )

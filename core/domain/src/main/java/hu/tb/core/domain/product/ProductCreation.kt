@@ -9,9 +9,7 @@ data class ProductCreation(
     val measure: Measure
 ) {
     fun toProduct() =
-        Product(
-            name, quantity, measure
-        )
+        Product(name, quantity, measure)
 
     fun toShopItem() =
         ShopItem(id, name, quantity, measure)

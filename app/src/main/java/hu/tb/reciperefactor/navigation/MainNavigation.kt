@@ -26,12 +26,12 @@ import androidx.navigation.navigation
 import hu.tb.presentation.storage.StorageScreen
 import hu.tb.recipe.presentation.RecipeScreen
 import hu.tb.recipe.presentation.create.CreateScreen
-import hu.tb.shopping.presentation.ShoppingScreen
+import hu.tb.shopping.presentation.ShopScreen
 
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
-    var selectedDestination by remember { mutableStateOf<Destination>(Destination.RecipeScreen()) }
+    var selectedDestination by remember { mutableStateOf<Destination>(Destination.ShoppingScreen()) }
 
     Scaffold(
         modifier = Modifier
@@ -84,7 +84,7 @@ fun MainNavigation() {
             startDestination = selectedDestination
         ) {
             composable<Destination.ShoppingScreen> {
-                ShoppingScreen()
+                ShopScreen()
             }
 
             recipeGraph(navController)

@@ -10,7 +10,7 @@ import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
-fun ShoppingFinishDialog(
+fun ShopFinishDialog(
     onAddItemsClick: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -36,7 +36,7 @@ fun ShoppingFinishDialog(
 @Composable
 private fun ShoppingFinishDialogPreview() {
     AppTheme {
-        ShoppingFinishDialog(
+        ShopFinishDialog(
             onAddItemsClick = {},
             onDismissRequest = {}
         )

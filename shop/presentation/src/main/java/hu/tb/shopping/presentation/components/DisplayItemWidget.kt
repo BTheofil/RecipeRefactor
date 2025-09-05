@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
-fun ShoppingItem(
+fun DisplayItemWidget(
     modifier: Modifier = Modifier,
     item: ShopItem,
     onCheckClick: (Boolean) -> Unit,
@@ -91,7 +91,12 @@ fun ShoppingItem(
                 modifier = Modifier
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.primaryContainer),
-                onClick = onEditClick,
+                onClick = {
+                    scope.launch {
+                        onEditClick()
+                        offset.animateTo(0f)
+                    }
+                },
                 content = {
                     Icon(Icons.Outlined.Edit, "edit icon")
                 }
@@ -198,14 +203,14 @@ private fun ShoppingItemPreview() {
             modifier = Modifier
                 .padding(32.dp)
         ) {
-            ShoppingItem(
+            DisplayItemWidget(
                 item = mockItem,
                 onCheckClick = {},
                 onEditClick = {},
                 onDeleteClick = {}
             )
             Spacer(Modifier.height(16.dp))
-            ShoppingItem(
+            DisplayItemWidget(
                 item = mockItem.copy(isChecked = false),
                 onCheckClick = {},
                 onEditClick = {},

@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ShoppingViewModel(
+class ShopViewModel(
     private val repository: ShopItemRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ShoppingState())
+    private val _state = MutableStateFlow(ShopState())
     val state = _state.asStateFlow()
 
-    private val _event = Channel<ShoppingEvent>()
+    private val _event = Channel<ShopEvent>()
     val event = _event.receiveAsFlow()
 
     init {
@@ -28,7 +28,7 @@ class ShoppingViewModel(
                 val unchecked = repoItems.filter { !it.isChecked }
                 val checked = repoItems.filter { it.isChecked }
                 _state.update {
-                    ShoppingState(
+                    ShopState(
                         uncheckedItems = unchecked,
                         checkedItems = checked
                     )
@@ -37,12 +37,12 @@ class ShoppingViewModel(
         }
     }
 
-    fun onAction(action: ShoppingAction) {
+    fun onAction(action: ShopAction) {
         when (action) {
-            ShoppingAction.DeleteAllItems -> deleteAllItems()
-            is ShoppingAction.ShopItemChange -> saveItemChanges(action.shopItem)
-            is ShoppingAction.DeleteItem -> deleteItem(action.item)
-            ShoppingAction.AddAllItemsToStorage -> addShoppingItemsToDepo()
+            ShopAction.DeleteAllItems -> deleteAllItems()
+            is ShopAction.ShopItemChange -> saveItemChanges(action.shopItem)
+            is ShopAction.DeleteItem -> deleteItem(action.item)
+            ShopAction.AddAllItemsToStorage -> addShoppingItemsToDepo()
         }
     }
 
@@ -74,7 +74,7 @@ class ShoppingViewModel(
         val completed = currentItems.any { it.isChecked }
         val uncompleted = currentItems.none { !it.isChecked }
         if (uncompleted && completed) {
-            _event.send(ShoppingEvent.ShowShoppingFinishedDialog)
+            _event.send(ShopEvent.ShowShopFinishedDialog)
         }
     }
 }

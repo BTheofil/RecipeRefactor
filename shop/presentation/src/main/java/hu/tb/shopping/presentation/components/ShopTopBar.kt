@@ -20,17 +20,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-sealed interface ShoppingTopBarAction {
-    data object AddShoppingItem : ShoppingTopBarAction
-    data object ClearBoard : ShoppingTopBarAction
-    data object ShoppingFinished : ShoppingTopBarAction
+sealed interface ShopTopBarAction {
+    data object ClearBoard : ShopTopBarAction
+    data object ShopFinished : ShopTopBarAction
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShoppingTopBar(
+fun ShopTopBar(
     isShoppingFinished: Boolean,
-    onAction: (ShoppingTopBarAction) -> Unit
+    onAction: (ShopTopBarAction) -> Unit
 ) {
     var isMenuOpen by remember { mutableStateOf(false) }
 
@@ -62,16 +61,9 @@ fun ShoppingTopBar(
                     onDismissRequest = { isMenuOpen = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Add item") },
-                        onClick = {
-                            onAction(ShoppingTopBarAction.AddShoppingItem)
-                            isMenuOpen = false
-                        }
-                    )
-                    DropdownMenuItem(
                         text = { Text("Clear the board") },
                         onClick = {
-                            onAction(ShoppingTopBarAction.ClearBoard)
+                            onAction(ShopTopBarAction.ClearBoard)
                             isMenuOpen = false
                         }
                     )
@@ -79,7 +71,7 @@ fun ShoppingTopBar(
                         DropdownMenuItem(
                             text = { Text("Finish shopping") },
                             onClick = {
-                                onAction(ShoppingTopBarAction.ShoppingFinished)
+                                onAction(ShopTopBarAction.ShopFinished)
                                 isMenuOpen = false
                             }
                         )
