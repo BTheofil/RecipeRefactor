@@ -13,12 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.core.domain.product.Measure
+import hu.tb.core.domain.product.Product
 import hu.tb.presentation.components.PlusButton
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
@@ -52,6 +57,7 @@ fun StorageScreen(
 private const val SHAKE_EFFECT_MIN = -2f
 private const val SHAKE_EFFECT_MAX = 2f
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StorageScreen(
     state: StorageState,
@@ -79,7 +85,7 @@ private fun StorageScreen(
         modifier = Modifier
             .fillMaxSize(),
         topBar = {
-            Spacer(Modifier.height(64.dp))
+            TopAppBar(title = {})
         },
     ) { innerPadding ->
         Column(
@@ -101,7 +107,7 @@ private fun StorageScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
-                    items = state.foods
+                    items = state.products
                 ) { item ->
                     Card(
                         modifier = Modifier
@@ -113,8 +119,13 @@ private fun StorageScreen(
                                 .padding(8.dp)
                         ) {
                             Text(
-                                text = item
+                                modifier = Modifier
+                                    .weight(1f),
+                                text = item.name
                             )
+                            Text(item.quantity.toString())
+                            Spacer(Modifier.width(4.dp))
+                            Text(item.measure.toDisplay)
                         }
                     }
                 }
@@ -135,8 +146,9 @@ private fun StorageScreen(
 private fun StorageScreenPreview() {
 
     val mockState = StorageState(
-        foods = listOf(
-            "apple", "banana", "lemon"
+        products = listOf(
+            Product("apple", 1.0, Measure.PIECE),
+            Product("potato", 2.0, Measure.KG),
         )
     )
 
