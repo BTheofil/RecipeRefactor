@@ -1,4 +1,4 @@
-package hu.tb.presentation.storage
+package hu.tb.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,7 +50,7 @@ private fun DepoScreen(
                 Text(
                     text = "My products",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             })
         },

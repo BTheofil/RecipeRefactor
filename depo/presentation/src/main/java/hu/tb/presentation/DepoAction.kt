@@ -1,4 +1,4 @@
-package hu.tb.presentation.storage
+package hu.tb.presentation
 
 sealed interface DepoAction {
     object OnAddFoodClick: DepoAction

@@ -23,8 +23,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import hu.tb.presentation.storage.DepoScreen
-import hu.tb.recipe.presentation.RecipeScreen
+import hu.tb.presentation.DepoScreen
+import hu.tb.recipe.presentation.main.RecipeScreen
 import hu.tb.recipe.presentation.create.CreateScreen
 import hu.tb.shopping.presentation.ShopScreen
 
@@ -113,7 +113,7 @@ private fun NavGraphBuilder.recipeGraph(controller: NavController) {
     ) {
         composable<Recipe.Main> {
             RecipeScreen(
-                onCreateRecipeClick = { controller.navigate(Recipe.Creation) }
+                createRecipeScreenRequest = { controller.navigate(Recipe.Creation) }
             )
         }
 

@@ -1,5 +1,6 @@
 package hu.tb.recipe.presentation.create.pages
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,15 +15,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.product.Product
 import hu.tb.presentation.components.ProductCreation
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.recipe.presentation.components.NextPageButton
 import hu.tb.recipe.presentation.create.CreateAction
 
 @Composable
@@ -34,53 +37,68 @@ fun IngredientsPage(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            itemsIndexed(
-                items = ingredients,
-            ) { index, product ->
-                product?.let {
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = product.name,
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        supportingContent = {
-                            Row {
+        if (ingredients.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Add some ingredients",
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                itemsIndexed(
+                    items = ingredients,
+                ) { index, product ->
+                    product?.let {
+                        ListItem(
+                            headlineContent = {
                                 Text(
-                                    text = product.quantity.toString(),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.secondary
+                                    text = product.name,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.primary
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = product.measure.toDisplay,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        },
-                        trailingContent = {
-                            IconButton(onClick = {
-                                onAction(
-                                    CreateAction.IngredientsAction.OnRemoveIngredient(
-                                        index
+                            },
+                            supportingContent = {
+                                Row {
+                                    Text(
+                                        text = product.quantity.toString(),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.secondary
                                     )
-                                )
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Delete,
-                                    contentDescription = "remove selected ingredient icon",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        })
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = product.measure.toDisplay,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            },
+                            trailingContent = {
+                                IconButton(onClick = {
+                                    onAction(
+                                        CreateAction.IngredientsAction.OnRemoveIngredient(
+                                            index
+                                        )
+                                    )
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Delete,
+                                        contentDescription = "remove selected ingredient icon",
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            })
+                    }
                 }
             }
         }
@@ -98,17 +116,11 @@ fun IngredientsCreatePanel(
         ProductCreation(
             onProductCreated = { onAction(CreateAction.IngredientsAction.OnAddIngredients(it.toProduct())) }
         )
-        OutlinedButton(
+        NextPageButton(
             modifier = Modifier
                 .fillMaxWidth(),
             onClick = { onAction(CreateAction.IngredientsAction.OnNextPage) }
-        ) {
-            Text(
-                text = "Next page",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+        )
     }
 }
 

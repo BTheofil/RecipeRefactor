@@ -33,7 +33,7 @@ class RecipeRepositoryImpl(
     override suspend fun delete(recipe: Recipe) =
         dao.delete(recipe.toEntity())
 
-    override fun getAll(): Flow<List<Recipe>> =
+    override fun getAllFlow(): Flow<List<Recipe>> =
         dao.getAll().map { entities ->
             entities.map { (recipeEntity, productList, stepList) ->
                 Recipe(

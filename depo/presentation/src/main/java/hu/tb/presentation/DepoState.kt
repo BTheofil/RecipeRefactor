@@ -1,4 +1,4 @@
-package hu.tb.presentation.storage
+package hu.tb.presentation
 
 import hu.tb.core.domain.product.Product
 

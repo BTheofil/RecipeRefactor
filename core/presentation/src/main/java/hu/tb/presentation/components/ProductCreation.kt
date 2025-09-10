@@ -87,7 +87,7 @@ fun ProductCreation(
                 },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Phone,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
