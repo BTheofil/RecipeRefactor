@@ -25,7 +25,7 @@ class ShopItemRepositoryImpl(
         }
 
     override suspend fun addShoppingItemsToDepo(shopItems: List<ShopItem>) {
-        val currentProducts = productDao.getAll()
+        val currentProducts = productDao.getAllCurrent()
 
         shopItems.forEach { shopItem ->
             val matchingProduct = currentProducts.find { product ->

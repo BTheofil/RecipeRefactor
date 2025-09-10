@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface ProductDao: BaseDao<ProductEntity> {
 
     @Query("SELECT * FROM ProductEntity WHERE recipeIdConnection IS NULL")
-    suspend fun getAll(): List<ProductEntity>
+    suspend fun getAllCurrent(): List<ProductEntity>
 
     @Query("SELECT * FROM ProductEntity WHERE recipeIdConnection IS NULL AND isChecked IS NULL")
     fun getAllFlow(): Flow<List<ProductEntity>>

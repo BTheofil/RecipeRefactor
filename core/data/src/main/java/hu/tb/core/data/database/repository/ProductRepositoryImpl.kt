@@ -18,8 +18,8 @@ class ProductRepositoryImpl(
     override suspend fun delete(product: Product) =
         dao.delete(product.toEntity())
 
-    override suspend fun getAll(): List<Product> =
-        dao.getAll().map { food -> food.toDomain() }
+    override suspend fun getAllCurrent(): List<Product> =
+        dao.getAllCurrent().map { food -> food.toDomain() }
 
     override fun getAllFlow(): Flow<List<Product>> =
         dao.getAllFlow().map { entities -> entities.map { it.toDomain() } }

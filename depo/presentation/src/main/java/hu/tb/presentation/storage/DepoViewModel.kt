@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class StorageViewModel(
+class DepoViewModel(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(StorageState())
+    private val _state = MutableStateFlow(DepoState())
     val state = _state.asStateFlow()
 
     init {
@@ -25,7 +25,7 @@ class StorageViewModel(
         }
     }
 
-    fun onAction(action: StorageAction) {
+    fun onAction(action: DepoAction) {
         when (action) {
             else -> {}
         }
