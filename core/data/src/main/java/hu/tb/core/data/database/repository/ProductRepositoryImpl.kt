@@ -5,6 +5,8 @@ import hu.tb.core.data.database.entity.toDomain
 import hu.tb.core.data.database.entity.toEntity
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.product.ProductRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class ProductRepositoryImpl(
     private val dao: ProductDao
@@ -16,6 +18,6 @@ class ProductRepositoryImpl(
     override suspend fun delete(product: Product) =
         dao.delete(product.toEntity())
 
-    override suspend fun getAll(): List<Product> =
-        dao.getAll().map { food -> food.toDomain() }
+    override fun getAllFlow(): Flow<List<Product>> =
+        dao.getAllFlow().map { entities -> entities.map { it.toDomain() } }
 }

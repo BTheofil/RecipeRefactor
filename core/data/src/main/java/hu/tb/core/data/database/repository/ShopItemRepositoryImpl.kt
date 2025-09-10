@@ -9,23 +9,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class ShopItemRepositoryImpl(
-    private val dao: ShopDao,
+    private val shopDao: ShopDao,
     private val productDao: ProductDao,
 ) : ShopItemRepository {
 
     override suspend fun saveItem(item: ShopItem): Long =
-        dao.insert(item.toEntity())
+        shopDao.insert(item.toEntity())
 
     override suspend fun deleteItem(item: ShopItem) =
-        dao.delete(item.toEntity())
+        shopDao.delete(item.toEntity())
 
     override fun getAllItem(): Flow<List<ShopItem>> =
-        dao.getAll().map { items ->
+        shopDao.getAll().map { items ->
             items.map { it.toShopDomain() }
         }
 
     override suspend fun addShoppingItemsToDepo(shopItems: List<ShopItem>) {
-        val currentProducts = productDao.getAll()
+        val currentProducts = productDao.getAllCurrent()
 
         shopItems.forEach { shopItem ->
             val matchingProduct = currentProducts.find { product ->
