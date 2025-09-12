@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.RecipeRepository
+import hu.tb.core.domain.step.Step
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,7 +67,7 @@ class CreateViewModel(
                         recipe = Recipe(
                             name = state.value.recipeName,
                             ingredients = state.value.ingredients,
-                            howToMakeSteps = state.value.steps
+                            howToMakeSteps = state.value.steps.map { Step(description = it) }
                         )
                     )
                     if (recipeId > -1) {

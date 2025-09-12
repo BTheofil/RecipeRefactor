@@ -17,13 +17,16 @@ import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.recipe.Recipe
+import hu.tb.core.domain.step.Step
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
 fun RecipeItem(
+    modifier: Modifier = Modifier,
     recipe: Recipe
 ) {
     ElevatedCard(
+        modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
@@ -64,10 +67,13 @@ private fun RecipeItemPreview() {
         ingredients = listOf(
             Product(name = "apple", quantity = 1.0, measure = Measure.PIECE)
         ),
-        howToMakeSteps = listOf("cut", "bake")
+        howToMakeSteps = listOf(
+            Step(id = 1, description = "cut"),
+            Step(id = 2, description = "bake")
+        )
     )
 
     AppTheme {
-        RecipeItem(mockRecipe)
+        RecipeItem(recipe = mockRecipe)
     }
 }

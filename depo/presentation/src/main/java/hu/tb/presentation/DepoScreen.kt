@@ -101,8 +101,8 @@ private fun StorageScreenPreview() {
 
     val mockState = DepoState(
         products = listOf(
-            Product("apple", 1.0, Measure.PIECE),
-            Product("potato", 2.0, Measure.KG),
+            Product(name = "apple", quantity = 1.0, measure = Measure.PIECE),
+            Product(name = "potato", quantity = 2.0, measure = Measure.KG),
         )
     )
 

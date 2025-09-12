@@ -1,5 +1,6 @@
 package hu.tb.recipe.presentation.main
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,12 +27,14 @@ import org.koin.androidx.compose.koinViewModel
 fun RecipeScreen(
     viewModel: RecipeViewModel = koinViewModel(),
     createRecipeScreenRequest: () -> Unit,
+    detailRecipeScreenRequest: (recipeId: Long) -> Unit
 ) {
     RecipeScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
         onAction = {
             when (it) {
-                is RecipeAction.CreateRecipeClick -> createRecipeScreenRequest()
+                is RecipeAction.RecipeClick -> detailRecipeScreenRequest(it.recipeId)
+                RecipeAction.CreateRecipeClick -> createRecipeScreenRequest()
             }
         },
     )
@@ -81,7 +84,13 @@ fun RecipeScreen(
                     items = state.recipes,
                     key = { it.id!! }
                 ) { recipe ->
-                    RecipeItem(recipe)
+                    RecipeItem(
+                        modifier = Modifier
+                            .clickable(
+                                onClick = { onAction(RecipeAction.RecipeClick(recipe.id!!)) },
+                            ),
+                        recipe = recipe
+                    )
                 }
             }
         }

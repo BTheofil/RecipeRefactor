@@ -21,7 +21,7 @@ class RecipeRepositoryImpl(
         recipe.howToMakeSteps.forEach {
             dao.insertRecipeStep(
                 StepEntity(
-                    description = it,
+                    description = it.description,
                     recipeIdConnection = recipeId
                 )
             )
@@ -40,7 +40,7 @@ class RecipeRepositoryImpl(
                     id = recipeEntity.recipeId,
                     name = recipeEntity.name,
                     ingredients = productList.map { it.toDomain() },
-                    howToMakeSteps = stepList.map { it.description }
+                    howToMakeSteps = stepList.map { it.toDomain()}
                 )
             }
         }

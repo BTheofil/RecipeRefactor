@@ -28,6 +28,7 @@ data class ProductEntity(
 
 fun ProductEntity.toDomain(): Product =
     Product(
+        id = productId,
         name = name,
         quantity = quantity,
         measure = measure
