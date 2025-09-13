@@ -23,17 +23,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import androidx.navigation.toRoute
 import hu.tb.presentation.DepoScreen
-import hu.tb.recipe.presentation.main.RecipeScreen
 import hu.tb.recipe.presentation.create.CreateScreen
 import hu.tb.recipe.presentation.details.DetailScreen
+import hu.tb.recipe.presentation.main.RecipeScreen
 import hu.tb.shopping.presentation.ShopScreen
 
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
-    var selectedDestination by remember { mutableStateOf<Destination>(Destination.ShoppingScreen()) }
+    var selectedDestination by remember { mutableStateOf<Destination>(Destination.RecipeScreen()) }
 
     Scaffold(
         modifier = Modifier
@@ -127,7 +126,6 @@ private fun NavGraphBuilder.recipeGraph(controller: NavController) {
         }
 
         composable<Recipe.Detail> {
-            val recipeId = it.toRoute<Recipe.Detail>().recipeId
             DetailScreen()
         }
     }

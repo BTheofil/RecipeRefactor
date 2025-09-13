@@ -40,8 +40,18 @@ class RecipeRepositoryImpl(
                     id = recipeEntity.recipeId,
                     name = recipeEntity.name,
                     ingredients = productList.map { it.toDomain() },
-                    howToMakeSteps = stepList.map { it.toDomain()}
+                    howToMakeSteps = stepList.map { it.toDomain() }
                 )
             }
+        }
+
+    override suspend fun getRecipeById(id: Long): Recipe =
+        dao.getRecipeById(id).run {
+            Recipe(
+                id = recipeEntity.recipeId,
+                name = recipeEntity.name,
+                ingredients = productEntity.map { it.toDomain() },
+                howToMakeSteps = howToMakeSteps.map { it.toDomain() }
+            )
         }
 }

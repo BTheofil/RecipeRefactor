@@ -23,4 +23,8 @@ interface RecipeDao: BaseDao<RecipeEntity> {
     @Transaction
     @Query("SELECT * FROM recipeentity")
     fun getAll(): Flow<List<RecipeCompleteEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM recipeentity WHERE recipeId = :id")
+    suspend fun getRecipeById(id: Long): RecipeCompleteEntity
 }

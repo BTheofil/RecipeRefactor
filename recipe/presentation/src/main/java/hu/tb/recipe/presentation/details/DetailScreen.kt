@@ -21,31 +21,39 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.step.Step
 import hu.tb.presentation.theme.AppTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun DetailScreen(
-    detailViewModel: DetailViewModel = viewModel()
+    viewModel: DetailViewModel = koinViewModel()
 ) {
-    DetailScreen()
+    DetailScreen(
+        recipe = viewModel.recipe.value,
+        makeRecipeClick = {}
+    )
 }
 
 @Composable
 private fun DetailScreen(
-    recipe: Recipe,
+    recipe: Recipe?,
     makeRecipeClick: () -> Unit
 ) {
     Column(
@@ -55,68 +63,72 @@ private fun DetailScreen(
             .padding(16.dp)
             .scrollable(rememberScrollState(), Orientation.Horizontal)
     ) {
-        SectionBackground(
-            content = {
-                Text(
-                    text = recipe.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        )
-        Spacer(Modifier.height(16.dp))
-        SectionBackground(
-            content = {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    items(
-                        items = recipe.ingredients,
-                        key = { it.id!! }
-                    ) { ingredient ->
-                        IngredientItem(ingredient)
-                    }
-                }
-            }
-        )
-        Spacer(Modifier.height(16.dp))
-        SectionBackground(
-            content = {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    itemsIndexed(
-                        items = recipe.howToMakeSteps,
-                        key = { index, item -> item.id!! }
-                    ) { index, step ->
-                        NumberedStep(
-                            index = index,
-                            description = step.description
-                        )
-                    }
-                }
-            }
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            Button(
-                onClick = makeRecipeClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
+        if (recipe == null) {
+            CircularProgressIndicator()
+        } else {
+            SectionBackground(
                 content = {
                     Text(
-                        text = "Make recipe",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        text = recipe.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             )
+            Spacer(Modifier.height(16.dp))
+            SectionBackground(
+                content = {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        items(
+                            items = recipe.ingredients,
+                            key = { it.id!! }
+                        ) { ingredient ->
+                            IngredientItem(ingredient)
+                        }
+                    }
+                }
+            )
+            Spacer(Modifier.height(16.dp))
+            SectionBackground(
+                content = {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        itemsIndexed(
+                            items = recipe.howToMakeSteps,
+                            key = { index, item -> item.id!! }
+                        ) { index, step ->
+                            NumberedStep(
+                                index = index + 1,
+                                description = step.description
+                            )
+                        }
+                    }
+                }
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Button(
+                    onClick = makeRecipeClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    content = {
+                        Text(
+                            text = "Make recipe",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                )
+            }
         }
     }
 }
@@ -156,11 +168,13 @@ private fun NumberedStep(
     index: Int,
     description: String,
 ) {
+    var stepLineCount by remember { mutableIntStateOf(-1) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = if (stepLineCount == 1) Alignment.CenterVertically else Alignment.Top,
     ) {
         Text(
             text = "$index.",
@@ -173,7 +187,10 @@ private fun NumberedStep(
                 .height(IntrinsicSize.Max),
             text = description,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            onTextLayout = {
+                stepLineCount = it.lineCount
+            }
         )
     }
 }
@@ -210,6 +227,6 @@ private fun DetailScreenPreview() {
     )
 
     AppTheme {
-        DetailScreen(mockRecipe, {})
+        DetailScreen(mockRecipe, makeRecipeClick = {})
     }
 }
