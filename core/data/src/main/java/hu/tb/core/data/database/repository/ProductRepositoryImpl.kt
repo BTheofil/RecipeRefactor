@@ -20,4 +20,7 @@ class ProductRepositoryImpl(
 
     override fun getAllFlow(): Flow<List<Product>> =
         dao.getAllFlow().map { entities -> entities.map { it.toDomain() } }
+
+    override suspend fun getProductById(id: Long): Product? =
+        dao.getProductById(id)?.toDomain()
 }

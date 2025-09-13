@@ -13,4 +13,7 @@ interface ProductDao: BaseDao<ProductEntity> {
 
     @Query("SELECT * FROM ProductEntity WHERE recipeIdConnection IS NULL AND isChecked IS NULL")
     fun getAllFlow(): Flow<List<ProductEntity>>
+
+    @Query("SELECT * FROM ProductEntity WHERE recipeIdConnection IS NULL AND isChecked IS NULL AND productId = :id")
+    suspend fun getProductById(id: Long): ProductEntity?
 }

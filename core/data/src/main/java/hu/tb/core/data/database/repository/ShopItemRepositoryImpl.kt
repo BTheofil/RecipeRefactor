@@ -30,8 +30,7 @@ class ShopItemRepositoryImpl(
         shopItems.forEach { shopItem ->
             val matchingProduct = currentProducts.find { product ->
                 product.name == shopItem.name &&
-                        product.measure.category == shopItem.measure.category &&
-                        product.isChecked == null
+                        product.measure.category == shopItem.measure.category
             }
 
             if (matchingProduct != null) {

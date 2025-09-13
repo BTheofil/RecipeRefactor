@@ -47,7 +47,7 @@ fun DetailScreen(
 ) {
     DetailScreen(
         recipe = viewModel.recipe.value,
-        makeRecipeClick = {}
+        makeRecipeClick = { viewModel.makeRecipeToProduct() }
     )
 }
 
