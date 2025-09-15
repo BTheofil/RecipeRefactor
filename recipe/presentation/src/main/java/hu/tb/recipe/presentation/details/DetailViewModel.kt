@@ -30,7 +30,8 @@ class DetailViewModel(
         recipe.value?.let {
             viewModelScope.launch {
                 it.ingredients.forEach { product ->
-                    val productInDepo = productRepository.getProductById(product.id!!)
+                    val productInDepo =
+                        productRepository.getProductByNameAndMeasure(product.name, product.measure)
 
                     if (productInDepo != null && productInDepo.measure.category == product.measure.category) {
                         val depoQuantity = productInDepo.quantity * productInDepo.measure.factor

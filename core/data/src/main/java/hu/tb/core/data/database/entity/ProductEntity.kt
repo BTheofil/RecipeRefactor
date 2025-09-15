@@ -36,6 +36,7 @@ fun ProductEntity.toDomain(): Product =
 
 fun Product.toEntity(recipeConnectionId: Long? = null): ProductEntity =
     ProductEntity(
+        productId = id,
         name = name,
         quantity = quantity,
         measure = measure,

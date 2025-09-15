@@ -119,6 +119,7 @@ private fun CreateScreen(
 
                     1 -> IngredientsPage(
                         ingredients = state.ingredients,
+                        suggestions = state.productsInDepo,
                         onAction = {
                             when (it) {
                                 is CreateAction.IngredientsAction.OnNextPage -> scope.launch {

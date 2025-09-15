@@ -5,16 +5,21 @@ import hu.tb.core.domain.shop.ShopItem
 data class ProductCreation(
     val id: Long? = null,
     val name: String,
-    val quantity: Double,
-    val measure: Measure
+    val quantity: Double? = null,
+    val measure: Measure? = null
 ) {
-    fun toProduct() =
-        Product(
+    fun toProduct(): Product {
+        require(quantity != null && measure != null) { "quantity or measure can not be null" }
+        return Product(
             name = name,
             quantity = quantity,
             measure = measure
         )
+    }
 
-    fun toShopItem() =
-        ShopItem(id, name, quantity, measure)
+
+    fun toShopItem(): ShopItem {
+        require(quantity != null && measure != null) { "quantity or measure can not be null" }
+        return ShopItem(id, name, quantity, measure)
+    }
 }

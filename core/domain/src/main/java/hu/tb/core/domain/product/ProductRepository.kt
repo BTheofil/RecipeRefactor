@@ -6,5 +6,6 @@ interface ProductRepository {
     suspend fun insert(product: Product): Long
     suspend fun delete(product: Product)
     fun getAllFlow(): Flow<List<Product>>
-    suspend fun getProductById(id: Long): Product?
+    suspend fun getProductByNameAndMeasure(name: String, measure: Measure): Product?
+    suspend fun getAllCurrent(): List<Product>
 }
