@@ -42,7 +42,10 @@ class DetailViewModel(
                     }
                 }
 
-                val newProduct = Product(name = it.name, quantity = 1.0, measure = Measure.PIECE)
+                val current = productRepository.getProductByNameAndMeasure(it.name, Measure.PIECE)
+                val newProduct = if (current != null)
+                    current.copy(quantity = current.quantity + 1.0)
+                else Product(name = it.name, quantity = 1.0, measure = Measure.PIECE)
                 productRepository.insert(newProduct)
             }
         }
