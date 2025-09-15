@@ -39,7 +39,8 @@ fun StepsPage(
                 interactionSource = null,
                 indication = null,
                 onClick = { focusManger.clearFocus() }
-            ),
+            )
+            .padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
@@ -69,6 +70,12 @@ fun StepsPage(
                                     text = it
                                 )
                             )
+                        },
+                        decorationBox = { innerTextField ->
+                            if (step.isEmpty()) {
+                                Text("write your recipe steps...")
+                            }
+                            innerTextField()
                         }
                     )
                 }

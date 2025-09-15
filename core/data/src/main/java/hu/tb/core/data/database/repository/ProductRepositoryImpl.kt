@@ -3,6 +3,7 @@ package hu.tb.core.data.database.repository
 import hu.tb.core.data.database.dao.ProductDao
 import hu.tb.core.data.database.entity.toDomain
 import hu.tb.core.data.database.entity.toEntity
+import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.product.ProductRepository
 import kotlinx.coroutines.flow.Flow
@@ -20,4 +21,10 @@ class ProductRepositoryImpl(
 
     override fun getAllFlow(): Flow<List<Product>> =
         dao.getAllFlow().map { entities -> entities.map { it.toDomain() } }
+
+    override suspend fun getProductByNameAndMeasure(name: String, measure: Measure): Product? =
+        dao.getProductByNameAndMeasure(name, measure)?.toDomain()
+
+    override suspend fun getAllCurrent(): List<Product> =
+        dao.getAllCurrent().map { it.toDomain() }
 }

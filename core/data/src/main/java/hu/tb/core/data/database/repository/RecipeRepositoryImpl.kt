@@ -21,7 +21,7 @@ class RecipeRepositoryImpl(
         recipe.howToMakeSteps.forEach {
             dao.insertRecipeStep(
                 StepEntity(
-                    description = it,
+                    description = it.description,
                     recipeIdConnection = recipeId
                 )
             )
@@ -33,15 +33,25 @@ class RecipeRepositoryImpl(
     override suspend fun delete(recipe: Recipe) =
         dao.delete(recipe.toEntity())
 
-    override fun getAll(): Flow<List<Recipe>> =
+    override fun getAllFlow(): Flow<List<Recipe>> =
         dao.getAll().map { entities ->
             entities.map { (recipeEntity, productList, stepList) ->
                 Recipe(
                     id = recipeEntity.recipeId,
                     name = recipeEntity.name,
                     ingredients = productList.map { it.toDomain() },
-                    howToMakeSteps = stepList.map { it.description }
+                    howToMakeSteps = stepList.map { it.toDomain() }
                 )
             }
+        }
+
+    override suspend fun getRecipeById(id: Long): Recipe =
+        dao.getRecipeById(id).run {
+            Recipe(
+                id = recipeEntity.recipeId,
+                name = recipeEntity.name,
+                ingredients = productEntity.map { it.toDomain() },
+                howToMakeSteps = howToMakeSteps.map { it.toDomain() }
+            )
         }
 }

@@ -1,4 +1,4 @@
-package hu.tb.presentation.storage
+package hu.tb.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -41,4 +41,5 @@ sealed interface Storage {
 sealed interface Recipe {
     @Serializable object Main
     @Serializable object Creation
+    @Serializable data class Detail(val recipeId: Long)
 }

@@ -28,6 +28,7 @@ data class ProductEntity(
 
 fun ProductEntity.toDomain(): Product =
     Product(
+        id = productId,
         name = name,
         quantity = quantity,
         measure = measure
@@ -35,6 +36,7 @@ fun ProductEntity.toDomain(): Product =
 
 fun Product.toEntity(recipeConnectionId: Long? = null): ProductEntity =
     ProductEntity(
+        productId = id,
         name = name,
         quantity = quantity,
         measure = measure,

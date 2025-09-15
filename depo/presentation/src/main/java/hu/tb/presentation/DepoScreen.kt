@@ -1,4 +1,4 @@
-package hu.tb.presentation.storage
+package hu.tb.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,7 +50,7 @@ private fun DepoScreen(
                 Text(
                     text = "My products",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             })
         },
@@ -101,8 +101,8 @@ private fun StorageScreenPreview() {
 
     val mockState = DepoState(
         products = listOf(
-            Product("apple", 1.0, Measure.PIECE),
-            Product("potato", 2.0, Measure.KG),
+            Product(name = "apple", quantity = 1.0, measure = Measure.PIECE),
+            Product(name = "potato", quantity = 2.0, measure = Measure.KG),
         )
     )
 

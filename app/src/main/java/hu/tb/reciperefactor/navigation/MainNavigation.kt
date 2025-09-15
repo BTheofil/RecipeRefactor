@@ -23,15 +23,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import hu.tb.presentation.storage.DepoScreen
-import hu.tb.recipe.presentation.RecipeScreen
+import hu.tb.presentation.DepoScreen
 import hu.tb.recipe.presentation.create.CreateScreen
+import hu.tb.recipe.presentation.details.DetailScreen
+import hu.tb.recipe.presentation.main.RecipeScreen
 import hu.tb.shopping.presentation.ShopScreen
 
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
-    var selectedDestination by remember { mutableStateOf<Destination>(Destination.ShoppingScreen()) }
+    var selectedDestination by remember { mutableStateOf<Destination>(Destination.RecipeScreen()) }
 
     Scaffold(
         modifier = Modifier
@@ -89,12 +90,12 @@ fun MainNavigation() {
 
             recipeGraph(navController)
 
-            storageGraph(navController)
+            storageGraph()
         }
     }
 }
 
-private fun NavGraphBuilder.storageGraph(controller: NavController) {
+private fun NavGraphBuilder.storageGraph() {
     navigation<Destination.StorageScreen>(
         startDestination = Storage.Main,
     ) {
@@ -113,7 +114,8 @@ private fun NavGraphBuilder.recipeGraph(controller: NavController) {
     ) {
         composable<Recipe.Main> {
             RecipeScreen(
-                onCreateRecipeClick = { controller.navigate(Recipe.Creation) }
+                createRecipeScreenRequest = { controller.navigate(Recipe.Creation) },
+                detailRecipeScreenRequest = { controller.navigate(Recipe.Detail(it)) }
             )
         }
 
@@ -121,6 +123,10 @@ private fun NavGraphBuilder.recipeGraph(controller: NavController) {
             CreateScreen(
                 navigateBack = { controller.popBackStack() }
             )
+        }
+
+        composable<Recipe.Detail> {
+            DetailScreen()
         }
     }
 }
