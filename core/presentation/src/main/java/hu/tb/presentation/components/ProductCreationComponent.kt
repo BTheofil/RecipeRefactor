@@ -26,14 +26,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.product.Measure
-import hu.tb.core.domain.product.ProductCreation
+import hu.tb.core.domain.product.ProductCreated
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
-fun ProductCreation(
+fun ProductCreationComponent(
     modifier: Modifier = Modifier,
-    prefillItem: ProductCreation? = null,
-    onProductCreated: (ProductCreation) -> Unit
+    prefillItem: ProductCreated? = null,
+    onProductCreated: (ProductCreated) -> Unit
 ) {
     var name by remember(prefillItem) { mutableStateOf(prefillItem?.name ?: "") }
     var quantity by remember(prefillItem) {
@@ -118,7 +118,7 @@ fun ProductCreation(
                     require(quantity.isNotEmpty())
                     isQuantityError = false
                     onProductCreated(
-                        ProductCreation(
+                        ProductCreated(
                             id = prefillItem?.id,
                             name = name,
                             quantity = quantity.toDouble(),
@@ -141,7 +141,7 @@ fun ProductCreation(
 @Composable
 private fun ProductCreationPreview() {
     AppTheme {
-        ProductCreation(
+        ProductCreationComponent(
             onProductCreated = {}
         )
     }

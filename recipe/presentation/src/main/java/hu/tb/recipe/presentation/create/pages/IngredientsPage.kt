@@ -35,8 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.product.Product
-import hu.tb.core.domain.product.ProductCreation
-import hu.tb.presentation.components.ProductCreation
+import hu.tb.core.domain.product.ProductCreated
+import hu.tb.presentation.components.ProductCreationComponent
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.recipe.presentation.components.NextPageButton
 import hu.tb.recipe.presentation.components.SuggestionSection
@@ -102,6 +102,7 @@ fun IngredientsPage(
             } else {
                 itemsIndexed(
                     items = ingredients,
+                    key = { index, item -> item?.id ?: index }
                 ) { index, product ->
                     product?.let {
                         ListItem(
@@ -169,8 +170,8 @@ fun IngredientCreatePanel(
     Column(
         modifier = modifier
     ) {
-        ProductCreation(
-            prefillItem = prefillName?.let { ProductCreation(name = prefillName) },
+        ProductCreationComponent(
+            prefillItem = prefillName?.let { ProductCreated(name = prefillName) },
             onProductCreated = { onAction(CreateAction.IngredientsAction.OnAddIngredients(it.toProduct())) }
         )
         NextPageButton(

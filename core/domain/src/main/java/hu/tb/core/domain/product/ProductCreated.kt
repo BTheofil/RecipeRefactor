@@ -2,7 +2,7 @@ package hu.tb.core.domain.product
 
 import hu.tb.core.domain.shop.ShopItem
 
-data class ProductCreation(
+data class ProductCreated(
     val id: Long? = null,
     val name: String,
     val quantity: Double? = null,

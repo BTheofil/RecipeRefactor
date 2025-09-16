@@ -21,7 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.shop.ShopItem
-import hu.tb.presentation.components.ProductCreation
+import hu.tb.presentation.components.ProductCreationComponent
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
@@ -57,7 +57,7 @@ fun NewShopItem(
                     )
                 }
             }
-            ProductCreation(
+            ProductCreationComponent(
                 prefillItem = editItem?.toProductCreation(),
                 onProductCreated = { onDone(it.toShopItem()) }
             )
