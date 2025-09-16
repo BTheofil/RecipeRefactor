@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -59,8 +58,8 @@ fun DisplayItemWidget(
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
 ) {
-    var offset by remember { mutableStateOf(Animatable(0f)) }
-    var actionComponentSize by remember { mutableFloatStateOf(0f) }
+    val offset = remember { Animatable(0f) }
+    var actionComponentWidth by remember { mutableFloatStateOf(0f) }
     var cardHeight by remember { mutableStateOf(0.dp) }
     var itemTextLineCount by remember { mutableIntStateOf(0) }
 
@@ -74,9 +73,8 @@ fun DisplayItemWidget(
         Row(
             modifier = Modifier
                 .then(if (item.isChecked) Modifier.alpha(0f) else Modifier.alpha(1f))
-                .height(IntrinsicSize.Max)
                 .onSizeChanged {
-                    actionComponentSize = it.width.toFloat()
+                    actionComponentWidth = it.width.toFloat()
                 }
                 .clip(
                     RoundedCornerShape(
@@ -123,14 +121,14 @@ fun DisplayItemWidget(
                             if (item.isChecked) return@detectHorizontalDragGestures
                             scope.launch {
                                 val newOffset =
-                                    (offset.value + dragAmount).coerceIn(0f, actionComponentSize)
+                                    (offset.value + dragAmount).coerceIn(0f, actionComponentWidth)
                                 offset.snapTo(newOffset)
                             }
                         },
                         onDragEnd = {
                             scope.launch {
-                                if (offset.value >= actionComponentSize / 2) {
-                                    offset.animateTo(actionComponentSize)
+                                if (offset.value >= actionComponentWidth / 2) {
+                                    offset.animateTo(actionComponentWidth)
                                 } else {
                                     offset.animateTo(0f)
                                 }

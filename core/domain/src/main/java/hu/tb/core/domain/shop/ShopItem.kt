@@ -1,7 +1,7 @@
 package hu.tb.core.domain.shop
 
 import hu.tb.core.domain.product.Measure
-import hu.tb.core.domain.product.ProductCreation
+import hu.tb.core.domain.product.ProductCreated
 
 data class ShopItem(
     val id: Long? = null,
@@ -11,7 +11,7 @@ data class ShopItem(
     val isChecked: Boolean = false
 ) {
     fun toProductCreation() =
-        ProductCreation(
+        ProductCreated(
             id, name, quantity, measure
         )
 }
