@@ -106,7 +106,9 @@ private fun NavGraphBuilder.storageGraph(controller: NavController) {
             )
         }
         composable<Storage.Creation> {
-            ProductCreateScreen()
+            ProductCreateScreen(
+                mainScreenRequest = { controller.popBackStack() }
+            )
         }
     }
 }

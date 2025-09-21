@@ -1,7 +1,6 @@
 package hu.tb.presentation.create
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,47 +15,55 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.product.Measure
+import hu.tb.core.domain.product.Product
 import hu.tb.presentation.components.TextFieldWithDropdownMenu
+import hu.tb.presentation.components.clearFocus
 import hu.tb.presentation.theme.AppTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ProductCreateScreen() {
+fun ProductCreateScreen(
+    viewModel: ProductCreateViewModel = koinViewModel(),
+    mainScreenRequest: () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            if(event is Long) {
+                mainScreenRequest()
+            }
+        }
+    }
+
     ProductCreateScreen(
-        onFinishClick = {}
+        onFinishClick = { viewModel.addNewProduct(it) }
     )
 }
 
 @Composable
 fun ProductCreateScreen(
-    onFinishClick: () -> Unit
+    onFinishClick: (Product) -> Unit
 ) {
 
     var name by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("0") }
     var measure by remember { mutableStateOf(Measure.entries.first()) }
 
-    val focusManager = LocalFocusManager.current
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .clickable(
-                onClick = { focusManager.clearFocus() },
-                interactionSource = null,
-                indication = null
-            )
+            .clearFocus()
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -109,7 +116,15 @@ fun ProductCreateScreen(
         Button(
             modifier = Modifier
                 .fillMaxWidth(),
-            onClick = onFinishClick,
+            onClick = {
+                onFinishClick(
+                    Product(
+                        name = name,
+                        quantity = quantity.toDouble(),
+                        measure = measure
+                    )
+                )
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
             )
