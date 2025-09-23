@@ -5,20 +5,39 @@ import androidx.lifecycle.viewModelScope
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.product.ProductRepository
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProductCreateViewModel(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
+    private val _state = MutableStateFlow(ProductCreateState())
+    val state = _state.asStateFlow()
+
     private val _event = Channel<Long?>()
     val event = _event.receiveAsFlow()
 
     fun addNewProduct(new: Product) {
         viewModelScope.launch {
-            val newId = productRepository.insert(new)
-            _event.send(newId)
+            checkValidInput(new)
+
+            if (!_state.value.isNameError && !_state.value.isQuantityError) {
+                val newId = productRepository.insert(new)
+                _event.send(newId)
+            }
+        }
+    }
+
+    private fun checkValidInput(givenValues: Product) {
+        _state.update {
+            it.copy(
+                isNameError = givenValues.name.isBlank(),
+                isQuantityError = givenValues.quantity <= 0
+            )
         }
     }
 }
