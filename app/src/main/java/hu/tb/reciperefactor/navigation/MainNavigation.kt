@@ -24,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import hu.tb.presentation.DepoScreen
+import hu.tb.presentation.create.ProductCreateScreen
 import hu.tb.recipe.presentation.create.CreateScreen
 import hu.tb.recipe.presentation.details.DetailScreen
 import hu.tb.recipe.presentation.main.RecipeScreen
@@ -90,20 +91,24 @@ fun MainNavigation() {
 
             recipeGraph(navController)
 
-            storageGraph()
+            storageGraph(navController)
         }
     }
 }
 
-private fun NavGraphBuilder.storageGraph() {
+private fun NavGraphBuilder.storageGraph(controller: NavController) {
     navigation<Destination.StorageScreen>(
         startDestination = Storage.Main,
     ) {
         composable<Storage.Main> {
-            DepoScreen()
+            DepoScreen(
+                productCreateScreenRequest = { controller.navigate(Storage.Creation) }
+            )
         }
         composable<Storage.Creation> {
-            //todo
+            ProductCreateScreen(
+                mainScreenRequest = { controller.popBackStack() }
+            )
         }
     }
 }

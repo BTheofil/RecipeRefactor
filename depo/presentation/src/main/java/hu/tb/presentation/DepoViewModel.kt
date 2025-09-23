@@ -24,10 +24,4 @@ class DepoViewModel(
             }
         }
     }
-
-    fun onAction(action: DepoAction) {
-        when (action) {
-            else -> {}
-        }
-    }
 }
