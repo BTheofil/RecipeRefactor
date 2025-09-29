@@ -1,5 +1,10 @@
 package hu.tb.recipe.presentation.create.pages
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +26,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,16 +48,33 @@ import hu.tb.recipe.presentation.components.NextPageButton
 import hu.tb.recipe.presentation.components.SuggestionSection
 import hu.tb.recipe.presentation.components.preview.ExampleProductParameterProvider
 import hu.tb.recipe.presentation.create.CreateAction
+import hu.tb.recipe.presentation.create.CreationState
 
 @Composable
 fun IngredientsPage(
-    ingredients: List<Product?>,
-    suggestions: List<Product>,
+    state: CreationState,
     onAction: (CreateAction.IngredientsAction) -> Unit
 ) {
     var suggestedProductName by remember { mutableStateOf<String?>(null) }
     var pageHeight by remember { mutableStateOf(0.dp) }
     var ingredientCreatePanelHeight by remember { mutableStateOf(0.dp) }
+    var errorAnimationState by remember { mutableStateOf(false) }
+    val colorAnim by animateColorAsState(
+        targetValue = if (errorAnimationState) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.surfaceVariant,
+        animationSpec = repeatable(
+            iterations = 5,
+            animation = tween(
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+    )
+
+    LaunchedEffect(state.isIngredientsHasError) {
+        if (state.isIngredientsHasError) {
+            errorAnimationState = true
+        }
+    }
 
     val focusManager = LocalFocusManager.current
     val density = LocalDensity.current
@@ -68,13 +91,13 @@ fun IngredientsPage(
                 pageHeight = with(density) { it.height.toDp() }
             }
     ) {
-        if (suggestions.isNotEmpty()) {
+        if (state.productsInDepo.isNotEmpty()) {
             SuggestionSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
                     .heightIn(max = (pageHeight - ingredientCreatePanelHeight) / 3),
-                suggestions = suggestions,
+                suggestions = state.productsInDepo,
                 onChipClick = { suggestedProductName = it }
             )
         }
@@ -84,7 +107,7 @@ fun IngredientsPage(
                 .weight(1f)
                 .padding(8.dp)
         ) {
-            if (ingredients.isEmpty()) {
+            if (state.ingredients.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier
@@ -94,56 +117,54 @@ fun IngredientsPage(
                         Text(
                             text = "Add some ingredients",
                             style = MaterialTheme.typography.displayMedium,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = colorAnim,
                             textAlign = TextAlign.Center
                         )
                     }
                 }
             } else {
                 itemsIndexed(
-                    items = ingredients,
-                    key = { index, item -> item?.id ?: index }
+                    items = state.ingredients,
+                    key = { index, item -> item.id ?: index }
                 ) { index, product ->
-                    product?.let {
-                        ListItem(
-                            headlineContent = {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = product.name,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        supportingContent = {
+                            Row {
                                 Text(
-                                    text = product.name,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.primary
+                                    text = product.quantity.toString(),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
-                            },
-                            supportingContent = {
-                                Row {
-                                    Text(
-                                        text = product.quantity.toString(),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.secondary
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = product.measure.toDisplay,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        },
+                        trailingContent = {
+                            IconButton(onClick = {
+                                onAction(
+                                    CreateAction.IngredientsAction.OnRemoveIngredient(
+                                        index
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = product.measure.toDisplay,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
-                                }
-                            },
-                            trailingContent = {
-                                IconButton(onClick = {
-                                    onAction(
-                                        CreateAction.IngredientsAction.OnRemoveIngredient(
-                                            index
-                                        )
-                                    )
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Delete,
-                                        contentDescription = "remove selected ingredient icon",
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            })
-                    }
+                                )
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Delete,
+                                    contentDescription = "remove selected ingredient icon",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        })
                 }
             }
         }
@@ -190,8 +211,9 @@ private fun IngredientsPagePreview(
 ) {
     AppTheme {
         IngredientsPage(
-            ingredients = emptyList(),
-            suggestions = mockProducts,
+            state = CreationState(
+                productsInDepo = mockProducts
+            ),
             onAction = {}
         )
     }

@@ -7,11 +7,13 @@ import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.RecipeRepository
 import hu.tb.core.domain.step.Step
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class CreateViewModel(
     private val recipeRepository: RecipeRepository,
@@ -76,6 +78,14 @@ class CreateViewModel(
 
             is CreateAction.StepsAction.FinishSteps -> {
                 viewModelScope.launch {
+                    resetCheck()
+                    delay(WAIT_STATE_RESET)
+                    checkInputs()
+                    if (state.value.isRecipeNameHasError ||
+                        state.value.isIngredientsHasError ||
+                        state.value.isStepsHasError
+                    ) return@launch
+
                     val recipeId = recipeRepository.save(
                         recipe = Recipe(
                             name = state.value.recipeName,
@@ -92,4 +102,26 @@ class CreateViewModel(
             else -> {}
         }
     }
+
+    private fun resetCheck() {
+        _state.update {
+            it.copy(
+                isRecipeNameHasError = false,
+                isIngredientsHasError = false,
+                isStepsHasError = false
+            )
+        }
+    }
+
+    private fun checkInputs() {
+        _state.update {
+            it.copy(
+                isRecipeNameHasError = state.value.recipeName.isBlank(),
+                isIngredientsHasError = state.value.ingredients.isEmpty(),
+                isStepsHasError = state.value.steps.contains("")
+            )
+        }
+    }
 }
+
+private val WAIT_STATE_RESET = 30.milliseconds

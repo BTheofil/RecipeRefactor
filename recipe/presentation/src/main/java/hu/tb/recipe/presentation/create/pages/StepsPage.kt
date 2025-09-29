@@ -24,10 +24,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.recipe.presentation.create.CreateAction
+import hu.tb.recipe.presentation.create.CreationState
 
 @Composable
 fun StepsPage(
-    stepList: List<String>,
+    state: CreationState,
     onAction: (CreateAction.StepsAction) -> Unit
 ) {
     val focusManger = LocalFocusManager.current
@@ -53,7 +54,7 @@ fun StepsPage(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            stepList.forEachIndexed { index, step ->
+            state.steps.forEachIndexed { index, step ->
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -110,7 +111,7 @@ fun StepsPage(
 private fun StepsPagePreview() {
     AppTheme {
         StepsPage(
-            stepList = listOf(""),
+            state = CreationState(),
             onAction = {}
         )
     }

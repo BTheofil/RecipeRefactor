@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -55,25 +56,31 @@ fun CreateScreen(
     )
 }
 
+private const val STARTER_PAGE_INDEX = 0
+private const val INGREDIENTS_PAGE_INDEX = 1
+private const val STEPS_PAGE_INDEX = 2
+private const val TOTAL_PAGE_COUNT = 3
+
 @Composable
 private fun CreateScreen(
     state: CreationState,
     onAction: (CreateAction) -> Unit
 ) {
     val pagerState = rememberPagerState(
-        initialPage = 0,
-        pageCount = { 3 }
+        initialPage = STARTER_PAGE_INDEX,
+        pageCount = { TOTAL_PAGE_COUNT }
     )
     var progress by remember { mutableFloatStateOf(0.1f) }
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
     )
-
     val scope = rememberCoroutineScope()
 
+    val focusManager = LocalFocusManager.current
+
     BackHandler(
-        enabled = pagerState.currentPage != 0
+        enabled = pagerState.currentPage != STARTER_PAGE_INDEX
     ) {
         scope.launch {
             pagerState.animateScrollToPage(pagerState.currentPage - 1)
@@ -82,9 +89,33 @@ private fun CreateScreen(
 
     LaunchedEffect(pagerState.settledPage) {
         when (pagerState.settledPage) {
-            0 -> progress = 0.1f
-            1 -> progress = 0.5f
-            2 -> progress = 0.9f
+            STARTER_PAGE_INDEX -> progress = 0.1f
+            INGREDIENTS_PAGE_INDEX -> progress = 0.5f
+            STEPS_PAGE_INDEX -> progress = 0.9f
+        }
+        focusManager.clearFocus()
+    }
+
+    LaunchedEffect(
+        state.isRecipeNameHasError,
+        state.isIngredientsHasError,
+        state.isStepsHasError
+    ) {
+        when {
+            state.isRecipeNameHasError -> {
+                pagerState.animateScrollToPage(STARTER_PAGE_INDEX)
+                return@LaunchedEffect
+            }
+
+            state.isIngredientsHasError -> {
+                pagerState.animateScrollToPage(INGREDIENTS_PAGE_INDEX)
+                return@LaunchedEffect
+            }
+
+            state.isStepsHasError -> {
+                pagerState.animateScrollToPage(STEPS_PAGE_INDEX)
+                return@LaunchedEffect
+            }
         }
     }
 
@@ -104,8 +135,8 @@ private fun CreateScreen(
             state = pagerState,
             pageContent = { index ->
                 when (index) {
-                    0 -> StarterPage(
-                        recipeName = state.recipeName,
+                    STARTER_PAGE_INDEX -> StarterPage(
+                        state = state,
                         onAction = {
                             when (it) {
                                 is CreateAction.StarterAction.OnNextPage -> scope.launch {
@@ -117,9 +148,8 @@ private fun CreateScreen(
                         }
                     )
 
-                    1 -> IngredientsPage(
-                        ingredients = state.ingredients,
-                        suggestions = state.productsInDepo,
+                    INGREDIENTS_PAGE_INDEX -> IngredientsPage(
+                        state = state,
                         onAction = {
                             when (it) {
                                 is CreateAction.IngredientsAction.OnNextPage -> scope.launch {
@@ -131,8 +161,8 @@ private fun CreateScreen(
                         }
                     )
 
-                    2 -> StepsPage(
-                        stepList = state.steps,
+                    STEPS_PAGE_INDEX -> StepsPage(
+                        state = state,
                         onAction = { onAction(it) }
                     )
                 }
