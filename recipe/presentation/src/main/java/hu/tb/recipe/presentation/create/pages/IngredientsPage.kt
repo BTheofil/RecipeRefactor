@@ -58,9 +58,9 @@ fun IngredientsPage(
     var suggestedProductName by remember { mutableStateOf<String?>(null) }
     var pageHeight by remember { mutableStateOf(0.dp) }
     var ingredientCreatePanelHeight by remember { mutableStateOf(0.dp) }
-    var errorAnimationState by remember { mutableStateOf(false) }
-    val colorAnim by animateColorAsState(
-        targetValue = if (errorAnimationState) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.surfaceVariant,
+    var isPlaceholderTextError by remember { mutableStateOf(false) }
+    val emptyPlaceholderTextColor by animateColorAsState(
+        targetValue = if (isPlaceholderTextError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.surfaceVariant,
         animationSpec = repeatable(
             iterations = 5,
             animation = tween(
@@ -71,9 +71,7 @@ fun IngredientsPage(
     )
 
     LaunchedEffect(state.isIngredientsHasError) {
-        if (state.isIngredientsHasError) {
-            errorAnimationState = true
-        }
+        isPlaceholderTextError = state.isIngredientsHasError
     }
 
     val focusManager = LocalFocusManager.current
@@ -117,7 +115,7 @@ fun IngredientsPage(
                         Text(
                             text = "Add some ingredients",
                             style = MaterialTheme.typography.displayMedium,
-                            color = colorAnim,
+                            color = emptyPlaceholderTextColor,
                             textAlign = TextAlign.Center
                         )
                     }
