@@ -76,6 +76,13 @@ class CreateViewModel(
                 )
             }
 
+            is CreateAction.StepsAction.RemoveStep -> _state.update {
+                it.copy(
+                    steps = state.value.steps.filterIndexed { index, item -> index != action.index }
+                )
+            }
+
+
             is CreateAction.StepsAction.FinishSteps -> {
                 viewModelScope.launch {
                     resetCheck()
