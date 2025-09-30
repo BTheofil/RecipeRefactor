@@ -7,11 +7,13 @@ import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.RecipeRepository
 import hu.tb.core.domain.step.Step
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class CreateViewModel(
     private val recipeRepository: RecipeRepository,
@@ -74,8 +76,33 @@ class CreateViewModel(
                 )
             }
 
+            is CreateAction.StepsAction.RemoveStep -> _state.update {
+                it.copy(
+                    steps = state.value.steps.filterIndexed { index, item -> index != action.index }
+                )
+            }
+
+
             is CreateAction.StepsAction.FinishSteps -> {
                 viewModelScope.launch {
+                    resetCheck()
+                    delay(WAIT_STATE_RESET)
+
+                    val currentState = state.value
+                    val hasNameError = currentState.recipeName.isBlank()
+                    val hasIngredientsError = currentState.ingredients.isEmpty()
+                    val hasStepsError = currentState.steps.any { it.isBlank() }
+
+                    _state.update {
+                        it.copy(
+                            isRecipeNameHasError = hasNameError,
+                            isIngredientsHasError = hasIngredientsError,
+                            isStepsHasError = hasStepsError
+                        )
+                    }
+
+                    if (hasNameError || hasIngredientsError || hasStepsError) return@launch
+
                     val recipeId = recipeRepository.save(
                         recipe = Recipe(
                             name = state.value.recipeName,
@@ -92,4 +119,16 @@ class CreateViewModel(
             else -> {}
         }
     }
+
+    private fun resetCheck() {
+        _state.update {
+            it.copy(
+                isRecipeNameHasError = false,
+                isIngredientsHasError = false,
+                isStepsHasError = false
+            )
+        }
+    }
 }
+
+private val WAIT_STATE_RESET = 30.milliseconds
