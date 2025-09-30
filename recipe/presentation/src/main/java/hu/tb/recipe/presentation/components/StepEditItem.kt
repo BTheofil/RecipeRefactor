@@ -64,7 +64,7 @@ fun StepEditItem(
                 modifier = Modifier
                     .graphicsLayer {
                         alpha = if (isRemoveIconVisible) {
-                            100f
+                            1f
                         } else {
                             0f
                         }

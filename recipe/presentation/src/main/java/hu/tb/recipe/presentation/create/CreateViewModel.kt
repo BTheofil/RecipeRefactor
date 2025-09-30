@@ -87,11 +87,21 @@ class CreateViewModel(
                 viewModelScope.launch {
                     resetCheck()
                     delay(WAIT_STATE_RESET)
-                    checkInputs()
-                    if (state.value.isRecipeNameHasError ||
-                        state.value.isIngredientsHasError ||
-                        state.value.isStepsHasError
-                    ) return@launch
+
+                    val currentState = state.value
+                    val hasNameError = currentState.recipeName.isBlank()
+                    val hasIngredientsError = currentState.ingredients.isEmpty()
+                    val hasStepsError = currentState.steps.any { it.isBlank() }
+
+                    _state.update {
+                        it.copy(
+                            isRecipeNameHasError = hasNameError,
+                            isIngredientsHasError = hasIngredientsError,
+                            isStepsHasError = hasStepsError
+                        )
+                    }
+
+                    if (hasNameError || hasIngredientsError || hasStepsError) return@launch
 
                     val recipeId = recipeRepository.save(
                         recipe = Recipe(
@@ -116,16 +126,6 @@ class CreateViewModel(
                 isRecipeNameHasError = false,
                 isIngredientsHasError = false,
                 isStepsHasError = false
-            )
-        }
-    }
-
-    private fun checkInputs() {
-        _state.update {
-            it.copy(
-                isRecipeNameHasError = state.value.recipeName.isBlank(),
-                isIngredientsHasError = state.value.ingredients.isEmpty(),
-                isStepsHasError = state.value.steps.any { step -> step == "" }
             )
         }
     }
