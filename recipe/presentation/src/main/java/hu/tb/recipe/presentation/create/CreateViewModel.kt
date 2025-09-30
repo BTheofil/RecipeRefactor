@@ -125,7 +125,7 @@ class CreateViewModel(
             it.copy(
                 isRecipeNameHasError = state.value.recipeName.isBlank(),
                 isIngredientsHasError = state.value.ingredients.isEmpty(),
-                isStepsHasError = state.value.steps.contains("")
+                isStepsHasError = state.value.steps.any { step -> step == "" }
             )
         }
     }
