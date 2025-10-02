@@ -1,14 +1,17 @@
 package hu.tb.recipe.presentation.details
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.product.ProductRepository
-import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.RecipeRepository
+import hu.tb.core.domain.recipe.details.Availability
+import hu.tb.core.domain.recipe.details.IngredientAvailability
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DetailViewModel(
@@ -17,17 +20,18 @@ class DetailViewModel(
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    val recipe = mutableStateOf<Recipe?>(null)
+    private val _state = MutableStateFlow(DetailState())
+    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
             val recipeId: Long = checkNotNull(savedStateHandle["recipeId"])
-            recipe.value = recipeRepository.getRecipeById(recipeId)
+            _state.update { it.copy(recipe = recipeRepository.getRecipeById(recipeId)) }
         }
     }
 
     fun makeRecipeToProduct() {
-        recipe.value?.let {
+        state.value.recipe?.let {
             viewModelScope.launch {
                 it.ingredients.forEach { product ->
                     val productInDepo =
@@ -37,17 +41,45 @@ class DetailViewModel(
                         val depoQuantity = productInDepo.quantity * productInDepo.measure.factor
                         val productQuantity = product.quantity * product.measure.factor
 
-                        val newQuantity = depoQuantity - productQuantity
+                        val newQuantity =
+                            (depoQuantity - productQuantity) / productInDepo.measure.factor
                         productRepository.insert(productInDepo.copy(quantity = newQuantity))
                     }
                 }
 
                 val current = productRepository.getProductByNameAndMeasure(it.name, Measure.PIECE)
-                val newProduct = if (current != null)
-                    current.copy(quantity = current.quantity + 1.0)
-                else Product(name = it.name, quantity = 1.0, measure = Measure.PIECE)
+                val newProduct = current?.copy(quantity = current.quantity + 1.0)
+                    ?: Product(name = it.name, quantity = 1.0, measure = Measure.PIECE)
                 productRepository.insert(newProduct)
             }
         }
+    }
+
+    fun runFullCheck() {
+        state.value.recipe?.ingredients?.forEach {
+            checkProductAvailability(it)
+        }
+    }
+
+    fun checkProductAvailability(product: Product) {
+        viewModelScope.launch {
+            val availability = calculateAvailability(product)
+            val updatedList = state.value.recipeIngredientsResult.toMutableList().apply {
+                add(IngredientAvailability(product, availability))
+            }
+            _state.update {
+                it.copy(recipeIngredientsResult = updatedList)
+            }
+        }
+    }
+
+    private suspend fun calculateAvailability(product: Product): Availability {
+        val depo = productRepository.getProductByNameAndMeasure(product.name, product.measure)
+            ?: return Availability.UNKNOWN
+
+        val depoCalcQuantity = depo.quantity * depo.measure.factor
+        val productQuantity = product.quantity * product.measure.factor
+
+        return if (depoCalcQuantity >= productQuantity) Availability.HAVE else Availability.LESS
     }
 }
