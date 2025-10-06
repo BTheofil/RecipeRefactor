@@ -30,7 +30,16 @@ class DetailViewModel(
         }
     }
 
-    fun makeRecipeToProduct() {
+    fun checkIngredientsAndMakeIt() {
+        if (state.value.recipeIngredientsResult.isEmpty()) {
+            checkProductAvailability()
+            return
+        }
+
+        makeRecipeToProduct()
+    }
+
+    private fun makeRecipeToProduct() {
         state.value.recipe?.let {
             viewModelScope.launch {
                 it.ingredients.forEach { product ->
@@ -55,20 +64,21 @@ class DetailViewModel(
         }
     }
 
-    fun runFullCheck() {
-        state.value.recipe?.ingredients?.forEach {
-            checkProductAvailability(it)
-        }
-    }
+    private fun checkProductAvailability() {
+        state.value.recipe?.ingredients?.forEach { product ->
+            viewModelScope.launch {
+                val availability = calculateAvailability(product)
+                val updatedList = state.value.recipeIngredientsResult.toMutableList().apply {
+                    add(IngredientAvailability(product, availability))
+                }
+                val allEnough = updatedList.none { it.availability == Availability.LESS }
 
-    fun checkProductAvailability(product: Product) {
-        viewModelScope.launch {
-            val availability = calculateAvailability(product)
-            val updatedList = state.value.recipeIngredientsResult.toMutableList().apply {
-                add(IngredientAvailability(product, availability))
-            }
-            _state.update {
-                it.copy(recipeIngredientsResult = updatedList)
+                _state.update { currentState ->
+                    currentState.copy(
+                        recipeIngredientsResult = updatedList,
+                        isRecipeCookable = allEnough
+                    )
+                }
             }
         }
     }

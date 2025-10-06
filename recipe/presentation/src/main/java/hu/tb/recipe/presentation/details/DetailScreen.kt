@@ -56,7 +56,7 @@ fun DetailScreen(
 ) {
     DetailScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
-        makeRecipeClick = { viewModel.runFullCheck() }
+        makeRecipeClick = { viewModel.checkIngredientsAndMakeIt() }
     )
 }
 
@@ -140,9 +140,13 @@ private fun DetailScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
+                    enabled = when {
+                        !state.isRecipeCookable && state.recipeIngredientsResult.isNotEmpty()-> false
+                        else -> true
+                    },
                     content = {
                         Text(
-                            text = "Check ingredients",
+                            text = if (state.recipeIngredientsResult.isEmpty()) "Check ingredients" else "Make recipe",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
