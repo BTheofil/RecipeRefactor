@@ -56,11 +56,22 @@ class DetailViewModel(
                     }
                 }
 
-                val current = productRepository.getProductByNameAndMeasure(it.name, Measure.PIECE)
-                val newProduct = current?.copy(quantity = current.quantity + 1.0)
+                val recipeProductInDepo = productRepository.getProductByNameAndMeasure(it.name, Measure.PIECE)
+                val newProduct = recipeProductInDepo?.copy(quantity = recipeProductInDepo.quantity + 1.0)
                     ?: Product(name = it.name, quantity = 1.0, measure = Measure.PIECE)
                 productRepository.insert(newProduct)
+
+                resetRecipeCheck()
             }
+        }
+    }
+
+    private fun resetRecipeCheck() {
+        _state.update {
+            it.copy(
+                recipeIngredientsResult = emptyList(),
+                isRecipeCookable = false
+            )
         }
     }
 
@@ -87,9 +98,11 @@ class DetailViewModel(
         val depo = productRepository.getProductByNameAndMeasure(product.name, product.measure)
             ?: return Availability.UNKNOWN
 
-        val depoCalcQuantity = depo.quantity * depo.measure.factor
+        if (depo.measure.category != product.measure.category) return Availability.UNKNOWN
+
+        val depoQuantity = depo.quantity * depo.measure.factor
         val productQuantity = product.quantity * product.measure.factor
 
-        return if (depoCalcQuantity >= productQuantity) Availability.HAVE else Availability.LESS
+        return if (depoQuantity >= productQuantity) Availability.HAVE else Availability.LESS
     }
 }
