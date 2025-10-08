@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.product.ProductRepository
+import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.RecipeRepository
 import hu.tb.core.domain.recipe.details.Availability
 import hu.tb.core.domain.recipe.details.IngredientAvailability
@@ -42,28 +43,39 @@ class DetailViewModel(
     private fun makeRecipeToProduct() {
         state.value.recipe?.let {
             viewModelScope.launch {
-                it.ingredients.forEach { product ->
-                    val productInDepo =
-                        productRepository.getProductByNameAndMeasure(product.name, product.measure)
-
-                    if (productInDepo != null && productInDepo.measure.category == product.measure.category) {
-                        val depoQuantity = productInDepo.quantity * productInDepo.measure.factor
-                        val productQuantity = product.quantity * product.measure.factor
-
-                        val newQuantity =
-                            (depoQuantity - productQuantity) / productInDepo.measure.factor
-                        productRepository.insert(productInDepo.copy(quantity = newQuantity))
-                    }
-                }
-
-                val recipeProductInDepo = productRepository.getProductByNameAndMeasure(it.name, Measure.PIECE)
-                val newProduct = recipeProductInDepo?.copy(quantity = recipeProductInDepo.quantity + 1.0)
-                    ?: Product(name = it.name, quantity = 1.0, measure = Measure.PIECE)
-                productRepository.insert(newProduct)
-
+                updateProductStockForRecipe(it)
+                insertOrUpdateFinalProduct(it.name)
                 resetRecipeCheck()
             }
         }
+    }
+
+    private suspend fun updateProductStockForRecipe(recipe: Recipe) {
+        recipe.ingredients.forEach { ingredient ->
+            val productInDepo = productRepository.getProductByNameAndMeasure(
+                ingredient.name, ingredient.measure
+            )
+
+            if (productInDepo != null && productInDepo.measure.category == ingredient.measure.category) {
+                val depoQuantity = productInDepo.quantity * productInDepo.measure.factor
+                val requiredQuantity = ingredient.quantity * ingredient.measure.factor
+
+                val updatedQuantity =
+                    (depoQuantity - requiredQuantity) / productInDepo.measure.factor
+                productRepository.insert(productInDepo.copy(quantity = updatedQuantity))
+            }
+        }
+    }
+
+    private suspend fun insertOrUpdateFinalProduct(recipeName: String) {
+        val existingProduct =
+            productRepository.getProductByNameAndMeasure(recipeName, Measure.PIECE)
+
+        val updatedProduct = existingProduct?.copy(
+            quantity = existingProduct.quantity + 1.0
+        ) ?: Product(name = recipeName, quantity = 1.0, measure = Measure.PIECE)
+
+        productRepository.insert(updatedProduct)
     }
 
     private fun resetRecipeCheck() {
@@ -76,16 +88,17 @@ class DetailViewModel(
     }
 
     private fun checkProductAvailability() {
-        state.value.recipe?.ingredients?.forEach { product ->
+        state.value.recipe?.let { recipe ->
             viewModelScope.launch {
-                val availability = calculateAvailability(product)
-                val updatedList = state.value.recipeIngredientsResult.toMutableList().apply {
-                    add(IngredientAvailability(product, availability))
+                val updatedList = recipe.ingredients.map { ingredient ->
+                    val availability = calculateAvailability(ingredient)
+                    IngredientAvailability(ingredient, availability)
                 }
+
                 val allEnough = updatedList.none { it.availability == Availability.LESS }
 
-                _state.update { currentState ->
-                    currentState.copy(
+                _state.update {
+                    it.copy(
                         recipeIngredientsResult = updatedList,
                         isRecipeCookable = allEnough
                     )
