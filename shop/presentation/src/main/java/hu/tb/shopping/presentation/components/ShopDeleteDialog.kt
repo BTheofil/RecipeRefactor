@@ -1,11 +1,10 @@
 package hu.tb.shopping.presentation.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import hu.tb.presentation.R
 import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
 
@@ -15,7 +14,7 @@ fun ShopDeleteDialog(
     onDismissRequest: () -> Unit
 ) {
     SimpleDialog(
-        icon = Icons.Outlined.Delete,
+        icon = R.drawable.delete,
         title = "Clear items",
         content = {
             Text(

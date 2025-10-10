@@ -1,5 +1,6 @@
 package hu.tb.presentation.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,15 +19,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import hu.tb.presentation.R
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
 fun SimpleDialog(
-    icon: ImageVector? = null,
+    @DrawableRes icon: Int? = null,
     title: String,
     content: @Composable () -> Unit,
     positiveButtonText: String,
@@ -50,7 +50,7 @@ fun SimpleDialog(
         ) {
             icon?.let {
                 Icon(
-                    imageVector = it,
+                    painter = painterResource(it),
                     tint = MaterialTheme.colorScheme.secondary,
                     contentDescription = "dialog icon"
                 )
@@ -103,7 +103,7 @@ fun SimpleDialog(
 private fun DialogPreview() {
     AppTheme {
         SimpleDialog(
-            icon = Icons.Default.Create,
+            icon = R.drawable.check_circle,
             title = "New item",
             content = {
                 Text("Dialog content")
