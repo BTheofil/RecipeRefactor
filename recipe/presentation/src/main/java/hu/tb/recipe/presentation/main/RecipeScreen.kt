@@ -84,7 +84,6 @@ fun RecipeScreen(
                 .padding(horizontal = 16.dp),
         ) {
             if (state.recipes.isEmpty()) {
-
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -96,26 +95,26 @@ fun RecipeScreen(
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.3f)
                     )
                 }
-
-            }
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                items(
-                    items = state.recipes,
-                    key = { it.id!! }
-                ) { recipe ->
-                    RecipeItem(
-                        modifier = Modifier
-                            .clickable(
-                                onClick = { onAction(RecipeAction.RecipeClick(recipe.id!!)) },
-                            ),
-                        recipe = recipe
-                    )
+            } else {
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    items(
+                        items = state.recipes,
+                        key = { it.id!! }
+                    ) { recipe ->
+                        RecipeItem(
+                            modifier = Modifier
+                                .clickable(
+                                    onClick = { onAction(RecipeAction.RecipeClick(recipe.id!!)) },
+                                ),
+                            recipe = recipe
+                        )
+                    }
                 }
             }
         }

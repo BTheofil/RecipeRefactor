@@ -1,5 +1,7 @@
 package hu.tb.recipe.presentation.details
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -13,15 +15,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,11 +38,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.recipe.Recipe
+import hu.tb.core.domain.recipe.details.Availability
 import hu.tb.core.domain.step.Step
 import hu.tb.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
@@ -46,14 +55,16 @@ fun DetailScreen(
     viewModel: DetailViewModel = koinViewModel()
 ) {
     DetailScreen(
-        recipe = viewModel.recipe.value,
-        makeRecipeClick = { viewModel.makeRecipeToProduct() }
+        state = viewModel.state.collectAsStateWithLifecycle().value,
+        makeRecipeClick = { viewModel.checkIngredientsAndMakeIt() }
     )
 }
 
+private const val CHECK_ANIMATION_DURATION_MILLIS = 400
+
 @Composable
 private fun DetailScreen(
-    recipe: Recipe?,
+    state: DetailState,
     makeRecipeClick: () -> Unit
 ) {
     Column(
@@ -63,13 +74,13 @@ private fun DetailScreen(
             .padding(16.dp)
             .scrollable(rememberScrollState(), Orientation.Horizontal)
     ) {
-        if (recipe == null) {
+        if (state.recipe == null) {
             CircularProgressIndicator()
         } else {
             SectionBackground(
                 content = {
                     Text(
-                        text = recipe.name,
+                        text = state.recipe.name,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -82,23 +93,28 @@ private fun DetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        items(
-                            items = recipe.ingredients,
-                            key = { it.id!! }
-                        ) { ingredient ->
-                            IngredientItem(ingredient)
+                        itemsIndexed(
+                            items = state.recipe.ingredients,
+                            key = { _, item -> item.id!! }
+                        ) { index, ingredient ->
+                            IngredientItem(
+                                ingredient = ingredient,
+                                availability = state.recipeIngredientsResult.find { it.product == ingredient }?.availability
+                                    ?: Availability.UNKNOWN,
+                                calculatedDelay = CHECK_ANIMATION_DURATION_MILLIS * index
+                            )
                         }
                     }
                 }
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
             SectionBackground(
                 content = {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         itemsIndexed(
-                            items = recipe.howToMakeSteps,
+                            items = state.recipe.howToMakeSteps,
                             key = { index, item -> item.id!! }
                         ) { index, step ->
                             NumberedStep(
@@ -116,13 +132,21 @@ private fun DetailScreen(
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Button(
-                    onClick = makeRecipeClick,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = {
+                        makeRecipeClick()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
+                    enabled = when {
+                        !state.isRecipeCookable && state.recipeIngredientsResult.isNotEmpty()-> false
+                        else -> true
+                    },
                     content = {
                         Text(
-                            text = "Make recipe",
+                            text = if (state.recipeIngredientsResult.isEmpty()) "Check ingredients" else "Make recipe",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
@@ -135,8 +159,21 @@ private fun DetailScreen(
 
 @Composable
 private fun IngredientItem(
-    ingredient: Product
+    ingredient: Product,
+    availability: Availability,
+    calculatedDelay: Int = 0
 ) {
+    val iconVisibility by animateFloatAsState(
+        targetValue = when (availability) {
+            Availability.HAVE, Availability.LESS -> 1f
+            Availability.UNKNOWN -> 0f
+        },
+        animationSpec = tween(
+            durationMillis = CHECK_ANIMATION_DURATION_MILLIS,
+            delayMillis = calculatedDelay
+        )
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,6 +197,19 @@ private fun IngredientItem(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.tertiary
         )
+        Spacer(Modifier.width(4.dp))
+
+        if (availability != Availability.UNKNOWN)
+            Icon(
+                modifier = Modifier
+                    .size(18.dp)
+                    .graphicsLayer {
+                        this.alpha = iconVisibility
+                    },
+                imageVector = if (availability == Availability.HAVE) Icons.Rounded.Check else Icons.Rounded.Close,
+                contentDescription = "check sign",
+                tint = MaterialTheme.colorScheme.primary
+            )
     }
 }
 
@@ -218,7 +268,9 @@ private fun DetailScreenPreview() {
         id = 1,
         name = "First meal",
         ingredients = listOf(
-            Product(id = 1, name = "apple", quantity = 1.0, measure = Measure.PIECE)
+            Product(id = 1, name = "apple", quantity = 1.0, measure = Measure.PIECE),
+            Product(id = 2, name = "apple", quantity = 1.0, measure = Measure.PIECE),
+            Product(id = 3, name = "apple", quantity = 1.0, measure = Measure.PIECE),
         ),
         howToMakeSteps = listOf(
             Step(id = 1, description = "cut"),
@@ -227,6 +279,6 @@ private fun DetailScreenPreview() {
     )
 
     AppTheme {
-        DetailScreen(mockRecipe, makeRecipeClick = {})
+        DetailScreen(state = DetailState(recipe = mockRecipe), makeRecipeClick = {})
     }
 }
