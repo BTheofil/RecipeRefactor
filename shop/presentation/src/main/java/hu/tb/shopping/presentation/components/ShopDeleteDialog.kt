@@ -4,9 +4,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import hu.tb.presentation.R
 import hu.tb.presentation.components.SimpleDialog
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 
 @Composable
 fun ShopDeleteDialog(
@@ -14,7 +14,7 @@ fun ShopDeleteDialog(
     onDismissRequest: () -> Unit
 ) {
     SimpleDialog(
-        icon = R.drawable.delete,
+        icon = Icon.delete,
         title = "Clear items",
         content = {
             Text(

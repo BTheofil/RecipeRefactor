@@ -33,7 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.shop.ShopItem
 import hu.tb.presentation.theme.AppTheme
-import hu.tb.shopping.presentation.components.NewShopItem
+import hu.tb.shopping.presentation.components.ShopPanel
 import hu.tb.shopping.presentation.components.ShopDeleteDialog
 import hu.tb.shopping.presentation.components.ShoppingEmptyScreen
 import hu.tb.shopping.presentation.components.ShopFinishDialog
@@ -177,7 +177,7 @@ fun ShopScreen(
                         .background(Color.Transparent)
                 ) {
                     if (isProductCreationVisible) {
-                        NewShopItem(
+                        ShopPanel(
                             editItem = editedItem,
                             onDone = { onAction(ShopAction.ShopItemChange(it)) },
                             onClose = {

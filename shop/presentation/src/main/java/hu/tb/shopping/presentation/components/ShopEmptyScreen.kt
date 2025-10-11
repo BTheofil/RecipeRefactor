@@ -5,17 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 
 @Composable
 fun ShoppingEmptyScreen() {
@@ -26,7 +26,7 @@ fun ShoppingEmptyScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Outlined.ShoppingCart,
+            painter = painterResource(Icon.shopping_cart),
             tint = MaterialTheme.colorScheme.primary.copy(
                 alpha = 0.6f
             ),

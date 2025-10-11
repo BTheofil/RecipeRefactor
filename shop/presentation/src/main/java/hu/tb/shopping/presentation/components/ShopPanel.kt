@@ -2,30 +2,34 @@ package hu.tb.shopping.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.tb.core.domain.shop.ShopItem
 import hu.tb.presentation.components.ProductCreationComponent
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 
 @Composable
-fun NewShopItem(
+fun ShopPanel(
     editItem: ShopItem? = null,
     onDone: (ShopItem) -> Unit,
     onClose: () -> Unit
@@ -40,18 +44,31 @@ fun NewShopItem(
                 shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)
             )
     ) {
-        Column {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp),
+                horizontalArrangement = if (editItem != null) Arrangement.SpaceBetween else Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                editItem?.let {
+                    Text(
+                        text = "Modify item",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
                 IconButton(
                     modifier = Modifier
                         .testTag("closeIcon"),
                     onClick = onClose
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.Close,
+                        painter = painterResource(Icon.close),
                         contentDescription = "close icon",
                         tint = MaterialTheme.colorScheme.secondary
                     )
@@ -70,7 +87,7 @@ fun NewShopItem(
 @Composable
 private fun NewShopItemPreview() {
     AppTheme {
-        NewShopItem(
+        ShopPanel(
             onDone = {},
             onClose = {}
         )
