@@ -85,7 +85,7 @@ fun ShopPanel(
 
 @Preview
 @Composable
-private fun NewShopItemPreview() {
+private fun ShopPanelPreview() {
     AppTheme {
         ShopPanel(
             onDone = {},

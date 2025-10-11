@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,14 +49,21 @@ fun DisplayItemWithMenu(
     menuOptions: @Composable () -> Unit,
     displayContent: @Composable () -> Unit,
     isEnabled: Boolean = true,
-    offset: Animatable<Float, AnimationVector1D> = Animatable(0f)
+    offset: Animatable<Float, AnimationVector1D>? = null
 ) {
+    val dragOffset = offset ?: remember { Animatable(0f) }
     var actionComponentWidth by remember { mutableFloatStateOf(0f) }
     var cardHeight by remember { mutableStateOf(0.dp) }
 
     val scope = rememberCoroutineScope()
 
     val density = LocalDensity.current
+
+    LaunchedEffect(isEnabled) {
+        if (!isEnabled && dragOffset.value > 0f) {
+            dragOffset.animateTo(0f)
+        }
+    }
 
     Box(
         modifier = modifier
@@ -82,7 +90,7 @@ fun DisplayItemWithMenu(
                 .onSizeChanged {
                     cardHeight = with(density) { it.height.toDp() }
                 }
-                .offset { IntOffset(offset.value.roundToInt(), 0) }
+                .offset { IntOffset(dragOffset.value.roundToInt(), 0) }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { _, dragAmount ->
@@ -90,16 +98,16 @@ fun DisplayItemWithMenu(
 
                             scope.launch {
                                 val newOffset =
-                                    (offset.value + dragAmount).coerceIn(0f, actionComponentWidth)
-                                offset.snapTo(newOffset)
+                                    (dragOffset.value + dragAmount).coerceIn(0f, actionComponentWidth)
+                                dragOffset.snapTo(newOffset)
                             }
                         },
                         onDragEnd = {
                             scope.launch {
-                                if (offset.value >= actionComponentWidth / 2) {
-                                    offset.animateTo(actionComponentWidth)
+                                if (dragOffset.value >= actionComponentWidth / 2) {
+                                    dragOffset.animateTo(actionComponentWidth)
                                 } else {
-                                    offset.animateTo(0f)
+                                    dragOffset.animateTo(0f)
                                 }
                             }
                         }
