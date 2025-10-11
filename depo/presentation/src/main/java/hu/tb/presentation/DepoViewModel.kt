@@ -2,6 +2,7 @@ package hu.tb.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.product.ProductRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,12 @@ class DepoViewModel(
                     it.copy(products = products)
                 }
             }
+        }
+    }
+
+    fun deleteProduct(product: Product) {
+        viewModelScope.launch {
+            productRepository.delete(product)
         }
     }
 }
