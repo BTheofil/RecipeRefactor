@@ -21,9 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +46,7 @@ import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.details.Availability
 import hu.tb.core.domain.step.Step
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -206,7 +205,7 @@ private fun IngredientItem(
                     .graphicsLayer {
                         this.alpha = iconVisibility
                     },
-                imageVector = if (availability == Availability.HAVE) Icons.Rounded.Check else Icons.Rounded.Close,
+                painter = painterResource(if (availability == Availability.HAVE) Icon.check_circle else Icon.close),
                 contentDescription = "check sign",
                 tint = MaterialTheme.colorScheme.primary
             )

@@ -1,18 +1,17 @@
 package hu.tb.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,12 +21,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
+import hu.tb.presentation.components.DisplayItemWithMenu
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -39,7 +41,8 @@ fun DepoScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
         action = {
             when (it) {
-                DepoAction.OnAddFoodClick -> productCreateScreenRequest()
+                DepoAction.AddProductClick -> productCreateScreenRequest()
+                is DepoAction.DeleteProduct -> viewModel.deleteProduct(it.product)
             }
         }
     )
@@ -65,10 +68,11 @@ private fun DepoScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { action(DepoAction.OnAddFoodClick) }
+                        onClick = { action(DepoAction.AddProductClick) }
                     ) {
                         Icon(
-                            Icons.Outlined.Add, contentDescription = "add product icon",
+                            painter = painterResource(id = Icon.add),
+                            contentDescription = "add product icon",
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
@@ -90,25 +94,36 @@ private fun DepoScreen(
                 items(
                     items = state.products
                 ) { item ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        ) {
-                            Text(
+                    DisplayItemWithMenu(
+                        modifier = Modifier.fillMaxWidth(),
+                        menuOptions = {
+                            IconButton(
                                 modifier = Modifier
-                                    .weight(1f),
-                                text = item.name
+                                    .fillMaxHeight()
+                                    .background(MaterialTheme.colorScheme.error),
+                                onClick = { action(DepoAction.DeleteProduct(item)) },
+                                content = {
+                                    Icon(painterResource(Icon.delete), "delete icon")
+                                }
                             )
-                            Text(item.quantity.toString())
-                            Spacer(Modifier.width(4.dp))
-                            Text(item.measure.toDisplay)
+                        },
+                        displayContent = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .weight(1f),
+                                    text = item.name
+                                )
+                                Text(item.quantity.toString())
+                                Spacer(Modifier.width(4.dp))
+                                Text(item.measure.toDisplay)
+                            }
                         }
-                    }
+                    )
                 }
             }
         }

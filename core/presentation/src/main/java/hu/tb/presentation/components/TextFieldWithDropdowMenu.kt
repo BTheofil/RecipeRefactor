@@ -3,8 +3,6 @@ package hu.tb.presentation.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -24,8 +22,10 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import hu.tb.presentation.R
 import hu.tb.presentation.theme.AppTheme
 
 @Composable
@@ -53,7 +53,7 @@ fun <T> TextFieldWithDropdownMenu(
                     itemWidth = with(density) { it.width.toDp() }
                 }
                 .onFocusChanged {
-                    if(it.isFocused) {
+                    if (it.isFocused) {
                         focusManager.clearFocus()
                         isDropdownMenuVisible = true
                     }
@@ -75,7 +75,7 @@ fun <T> TextFieldWithDropdownMenu(
                     onClick = { isDropdownMenuVisible = true }) {
                     Icon(
                         modifier = Modifier,
-                        imageVector = Icons.Rounded.MoreVert,
+                        painter = painterResource(R.drawable.more_vert),
                         contentDescription = "measurements menu icon"
                     )
                 }
