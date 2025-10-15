@@ -1,6 +1,6 @@
 package hu.tb.reciperefactor.navigation
 
-import hu.tb.reciperefactor.R
+import hu.tb.presentation.theme.Icon
 import kotlinx.serialization.Serializable
 
 sealed interface Destination {
@@ -10,19 +10,19 @@ sealed interface Destination {
     @Serializable
     data class ShoppingScreen(
         override val route: String = "Shopping List",
-        override val icon: Int = R.drawable.outline_shopping_cart_24
+        override val icon: Int = Icon.shopping_cart
     ) : Destination
 
     @Serializable
     data class RecipeScreen(
         override val route: String = "Recipe",
-        override val icon: Int = R.drawable.outline_book_24
+        override val icon: Int = Icon.book
     ) : Destination
 
     @Serializable
     data class StorageScreen(
         override val route: String = "Storage",
-        override val icon: Int = R.drawable.outline_storage_24
+        override val icon: Int = Icon.storage
     ) : Destination
 }
 

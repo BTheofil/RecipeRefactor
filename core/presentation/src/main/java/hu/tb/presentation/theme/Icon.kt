@@ -11,4 +11,6 @@ object Icon {
     val edit = R.drawable.edit
     val more_vert = R.drawable.more_vert
     val shopping_cart = R.drawable.shopping_cart
+    val storage = R.drawable.storage
+    val book = R.drawable.book
 }
