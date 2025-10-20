@@ -38,5 +38,13 @@ gradlePlugin {
             id = "recipe.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
         }
+        register("androidLibraryCompose"){
+            id = "recipe.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
+        register("jvmLibrary"){
+            id = "recipe.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
     }
 }
