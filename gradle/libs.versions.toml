@@ -82,3 +82,4 @@ room = { id = "androidx.room", version.ref = "roomVersion" }
 
 recipe-android-application = { id = "recipe.android.application" }
 recipe-android-application-compose = { id = "recipe.android.application.compose" }
+recipe-android-library = { id = "recipe.android.library" }

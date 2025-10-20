@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.recipe.android.library)
     kotlin("plugin.serialization") version libs.versions.kotlin
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.room)
@@ -10,36 +7,9 @@ plugins {
 
 android {
     namespace = "hu.tb.core.data"
-    compileSdk = libs.versions.compileSdkVersion.get().toInt()
 
     room {
         schemaDirectory("$projectDir/schemas")
-    }
-
-    defaultConfig {
-        minSdk = libs.versions.minSdkVersion.get().toInt()
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_11
-        }
     }
 }
 
