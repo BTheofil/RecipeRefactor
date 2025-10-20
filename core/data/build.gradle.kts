@@ -14,9 +14,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-
     implementation(libs.ktor.core)
     implementation(libs.ktor.cio)
     implementation(libs.ktor.logging)
