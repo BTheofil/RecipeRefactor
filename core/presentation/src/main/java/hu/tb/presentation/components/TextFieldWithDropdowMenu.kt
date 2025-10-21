@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hu.tb.presentation.R
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 
 @Composable
 fun <T> TextFieldWithDropdownMenu(
@@ -75,7 +75,7 @@ fun <T> TextFieldWithDropdownMenu(
                     onClick = { isDropdownMenuVisible = true }) {
                     Icon(
                         modifier = Modifier,
-                        painter = painterResource(R.drawable.more_vert),
+                        painter = painterResource(Icon.more_vert),
                         contentDescription = "measurements menu icon"
                     )
                 }

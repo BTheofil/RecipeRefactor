@@ -1,6 +1,6 @@
 package hu.tb.presentation.theme
 
-import hu.tb.presentation.R
+import hu.tb.core.presentation.R
 
 object Icon {
     val add = R.drawable.add

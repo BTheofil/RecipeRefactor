@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "hu.tb.presentation"
+    namespace = "hu.tb.core.presentation"
 }
 
 dependencies {
