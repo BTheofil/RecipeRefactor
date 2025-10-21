@@ -1,16 +1,11 @@
 plugins {
     alias(libs.plugins.recipe.android.library)
+    alias(libs.plugins.recipe.android.room)
     kotlin("plugin.serialization") version libs.versions.kotlin
-    alias(libs.plugins.devtools.ksp)
-    alias(libs.plugins.room)
 }
 
 android {
     namespace = "hu.tb.core.data"
-
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
 }
 
 dependencies {
@@ -20,17 +15,13 @@ dependencies {
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.json)
 
-    ksp(libs.room)
-    implementation(libs.room.runtime)
-    implementation(libs.room.coroutines)
-
-    implementation(libs.koin)
-
-    implementation(projects.core.domain)
+    implementation(libs.bundles.koin)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.truth)
+    
+    implementation(projects.core.domain)
 }
