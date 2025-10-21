@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import hu.tb.presentation.theme.Icon
 
 @Composable
 fun StepEditItem(
@@ -74,7 +75,7 @@ fun StepEditItem(
                 }
             ) {
                 Icon(
-                    painterResource(hu.tb.presentation.R.drawable.close),
+                    painterResource(Icon.close),
                     "close icon",
                     tint = MaterialTheme.colorScheme.error
                 )
