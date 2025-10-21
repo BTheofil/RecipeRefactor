@@ -1,4 +1,4 @@
-import hu.tb.convention.addUiLayerDependencies
+import hu.tb.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
@@ -12,7 +12,9 @@ class AndroidFeatureUiConventionPlugin: Plugin<Project> {
             }
 
             dependencies {
-                addUiLayerDependencies(target)
+                "implementation"(project.libs.findBundle("koin").get())
+                "implementation"(project.libs.findBundle("compose").get())
+                "debugImplementation"(project.libs.findBundle("compose.debug").get())
             }
         }
     }

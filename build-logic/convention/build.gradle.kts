@@ -46,8 +46,8 @@ gradlePlugin {
             id = "recipe.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
         }
-        register("androidFeature"){
-            id = "recipe.android.feature"
+        register("androidFeatureUi"){
+            id = "recipe.android.feature.ui"
             implementationClass = "AndroidFeatureUiConventionPlugin"
         }
     }
