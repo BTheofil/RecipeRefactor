@@ -6,10 +6,6 @@ plugins {
 
 android {
     namespace = "hu.tb.reciperefactor"
-
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
 }
 
 dependencies {
@@ -29,7 +25,7 @@ dependencies {
 
     implementation(projects.core.data)
     implementation(projects.core.presentation)
-    implementation(projects.shop.presentation)
+    implementation(projects.shopping.presentation)
     implementation(projects.recipe.presentation)
     implementation(projects.depo.presentation)
 }
