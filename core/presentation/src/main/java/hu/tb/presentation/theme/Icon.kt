@@ -1,6 +1,6 @@
 package hu.tb.presentation.theme
 
-import hu.tb.presentation.R
+import hu.tb.core.presentation.R
 
 object Icon {
     val add = R.drawable.add
@@ -11,4 +11,6 @@ object Icon {
     val edit = R.drawable.edit
     val more_vert = R.drawable.more_vert
     val shopping_cart = R.drawable.shopping_cart
+    val storage = R.drawable.storage
+    val book = R.drawable.book
 }

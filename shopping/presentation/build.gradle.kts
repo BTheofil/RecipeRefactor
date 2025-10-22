@@ -3,16 +3,15 @@ plugins {
 }
 
 android {
-    namespace = "hu.tb.recipe.presentation"
+    namespace = "hu.tb.shopping.presentation"
 }
 
 dependencies {
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(projects.core.presentation)
     implementation(projects.core.domain)

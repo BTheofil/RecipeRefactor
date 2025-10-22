@@ -23,8 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import hu.tb.presentation.R
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 
 @Composable
 fun SimpleDialog(
@@ -103,7 +103,7 @@ fun SimpleDialog(
 private fun DialogPreview() {
     AppTheme {
         SimpleDialog(
-            icon = R.drawable.check_circle,
+            icon = Icon.check_circle,
             title = "New item",
             content = {
                 Text("Dialog content")
