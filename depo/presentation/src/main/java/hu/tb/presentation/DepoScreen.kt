@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -28,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.presentation.components.DisplayItemWithMenu
+import hu.tb.presentation.components.EmptyScreen
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.presentation.theme.Icon
 import org.koin.androidx.compose.koinViewModel
@@ -61,22 +63,12 @@ private fun DepoScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "My products",
+                        text = "Storage",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 },
-                actions = {
-                    IconButton(
-                        onClick = { action(DepoAction.AddProductClick) }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = Icon.add),
-                            contentDescription = "add product icon",
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                })
+            )
         },
     ) { innerPadding ->
         Column(
@@ -85,6 +77,9 @@ private fun DepoScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+            if (state.products.isEmpty()) {
+                EmptyScreen()
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -126,6 +121,17 @@ private fun DepoScreen(
                     )
                 }
             }
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onClick = { action(DepoAction.AddProductClick) }
+            ) {
+                Text(
+                    text = "Add new product",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
@@ -133,14 +139,12 @@ private fun DepoScreen(
 @Preview
 @Composable
 private fun StorageScreenPreview() {
-
     val mockState = DepoState(
         products = listOf(
             Product(name = "apple", quantity = 1.0, measure = Measure.PIECE),
             Product(name = "potato", quantity = 2.0, measure = Measure.KG),
         )
     )
-
 
     AppTheme {
         DepoScreen(
