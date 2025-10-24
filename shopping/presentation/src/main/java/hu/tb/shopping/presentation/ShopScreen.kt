@@ -14,9 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,14 +30,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.shop.ShopItem
+import hu.tb.presentation.components.OutlineButtonPrimary
 import hu.tb.presentation.theme.AppTheme
-import hu.tb.shopping.presentation.components.ShopPanel
-import hu.tb.shopping.presentation.components.ShopDeleteDialog
-import hu.tb.shopping.presentation.components.ShoppingEmptyScreen
-import hu.tb.shopping.presentation.components.ShopFinishDialog
 import hu.tb.shopping.presentation.components.DisplayItemWidget
+import hu.tb.shopping.presentation.components.ShopDeleteDialog
+import hu.tb.shopping.presentation.components.ShopFinishDialog
+import hu.tb.shopping.presentation.components.ShopPanel
 import hu.tb.shopping.presentation.components.ShopTopBar
 import hu.tb.shopping.presentation.components.ShopTopBarAction
+import hu.tb.shopping.presentation.components.ShoppingEmptyScreen
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -193,17 +192,9 @@ fun ShopScreen(
                                 .padding(horizontal = 22.dp)
                                 .padding(bottom = 8.dp)
                         ) {
-                            OutlinedButton(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                onClick = { isProductCreationVisible = true },
-                                content = {
-                                    Text(
-                                        text = "Create new item",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                            OutlineButtonPrimary(
+                                text = "Create new item",
+                                onClick = { isProductCreationVisible = true }
                             )
                         }
                     }
