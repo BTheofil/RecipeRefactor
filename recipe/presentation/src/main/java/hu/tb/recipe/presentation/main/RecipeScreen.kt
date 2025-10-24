@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import hu.tb.presentation.components.FadedText
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.presentation.theme.Icon
 import hu.tb.recipe.presentation.components.RecipeItem
@@ -89,10 +90,8 @@ fun RecipeScreen(
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "No recipes yet",
-                        style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.3f)
+                    FadedText(
+                        text = "No recipes yet"
                     )
                 }
             } else {

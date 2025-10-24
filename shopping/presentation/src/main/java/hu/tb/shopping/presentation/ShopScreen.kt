@@ -111,61 +111,60 @@ fun ShopScreen(
                 modifier = Modifier
                     .padding(innerPadding),
             ) {
-                Spacer(Modifier.height(8.dp))
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    if (state.checkedItems.isEmpty() && state.uncheckedItems.isEmpty()) {
-                        item {
-                            ShoppingEmptyScreen()
-                        }
-                    }
-                    items(
-                        items = state.uncheckedItems,
-                        key = { it -> it.id ?: it.hashCode() }
-                    ) { item ->
-                        DisplayItemWidget(
-                            modifier = Modifier
-                                .animateItem(),
-                            item = item,
-                            onCheckClick = { isChecked ->
-                                onAction(ShopAction.ShopItemChange(item.copy(isChecked = isChecked)))
-                            },
-                            onDeleteClick = { onAction(ShopAction.DeleteItem(item)) },
-                            onEditClick = {
-                                scope.launch {
-                                    editedItem = item
-                                    isProductCreationVisible = true
-                                }
-                            }
-                        )
-                    }
-                    if (state.checkedItems.isNotEmpty()) {
-                        item {
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .padding(horizontal = 32.dp),
-                                thickness = 2.dp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                if (state.checkedItems.isEmpty() && state.uncheckedItems.isEmpty()) {
+                    ShoppingEmptyScreen()
+                } else {
+                    Spacer(Modifier.height(8.dp))
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
                         items(
-                            items = state.checkedItems,
+                            items = state.uncheckedItems,
                             key = { it -> it.id ?: it.hashCode() }
                         ) { item ->
                             DisplayItemWidget(
-                                modifier = Modifier.animateItem(),
+                                modifier = Modifier
+                                    .animateItem(),
                                 item = item,
                                 onCheckClick = { isChecked ->
-                                    onAction(
-                                        ShopAction.ShopItemChange(
-                                            item.copy(isChecked = isChecked)
-                                        )
-                                    )
+                                    onAction(ShopAction.ShopItemChange(item.copy(isChecked = isChecked)))
                                 },
+                                onDeleteClick = { onAction(ShopAction.DeleteItem(item)) },
+                                onEditClick = {
+                                    scope.launch {
+                                        editedItem = item
+                                        isProductCreationVisible = true
+                                    }
+                                }
                             )
+                        }
+                        if (state.checkedItems.isNotEmpty()) {
+                            item {
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .padding(horizontal = 32.dp),
+                                    thickness = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            items(
+                                items = state.checkedItems,
+                                key = { it -> it.id ?: it.hashCode() }
+                            ) { item ->
+                                DisplayItemWidget(
+                                    modifier = Modifier.animateItem(),
+                                    item = item,
+                                    onCheckClick = { isChecked ->
+                                        onAction(
+                                            ShopAction.ShopItemChange(
+                                                item.copy(isChecked = isChecked)
+                                            )
+                                        )
+                                    },
+                                )
+                            }
                         }
                     }
                 }
