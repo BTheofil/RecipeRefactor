@@ -86,8 +86,8 @@ fun RecipeScreen(
                 EmptyScreen(
                     modifier = Modifier
                         .weight(1f),
-                    text = "No products in storage",
-                    icon = Icon.storage
+                    text = "No recipes yet",
+                    icon = Icon.book
                 )
             } else {
                 LazyVerticalGrid(

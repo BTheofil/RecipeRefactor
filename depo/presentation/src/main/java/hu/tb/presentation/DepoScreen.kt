@@ -80,7 +80,7 @@ private fun DepoScreen(
                     modifier = Modifier
                         .weight(1f),
                     text = "No products in storage",
-                    icon = Icon.book
+                    icon = Icon.storage
                 )
             } else {
                 LazyColumn(
