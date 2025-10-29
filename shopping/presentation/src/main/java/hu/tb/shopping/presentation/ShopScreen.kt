@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,15 +31,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.shop.ShopItem
+import hu.tb.presentation.components.EmptyScreen
 import hu.tb.presentation.components.OutlineButtonPrimary
 import hu.tb.presentation.theme.AppTheme
+import hu.tb.presentation.theme.Icon
 import hu.tb.shopping.presentation.components.DisplayItemWidget
 import hu.tb.shopping.presentation.components.ShopDeleteDialog
 import hu.tb.shopping.presentation.components.ShopFinishDialog
 import hu.tb.shopping.presentation.components.ShopPanel
 import hu.tb.shopping.presentation.components.ShopTopBar
 import hu.tb.shopping.presentation.components.ShopTopBarAction
-import hu.tb.shopping.presentation.components.ShoppingEmptyScreen
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -112,7 +114,12 @@ fun ShopScreen(
                     .padding(innerPadding),
             ) {
                 if (state.checkedItems.isEmpty() && state.uncheckedItems.isEmpty()) {
-                    ShoppingEmptyScreen()
+                    EmptyScreen(
+                        modifier = Modifier
+                            .weight(1f),
+                        text = "Your list is empty",
+                        icon = Icon.shopping_cart
+                    )
                 } else {
                     Spacer(Modifier.height(8.dp))
                     LazyColumn(
@@ -142,12 +149,17 @@ fun ShopScreen(
                         }
                         if (state.checkedItems.isNotEmpty()) {
                             item {
-                                HorizontalDivider(
+                                Row(
                                     modifier = Modifier
-                                        .padding(horizontal = 32.dp),
-                                    thickness = 2.dp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                        .fillMaxWidth()
+                                ) {
+                                    HorizontalDivider(
+                                        modifier = Modifier
+                                            .padding(horizontal = 32.dp),
+                                        thickness = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
                             items(
                                 items = state.checkedItems,
