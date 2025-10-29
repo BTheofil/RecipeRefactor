@@ -13,4 +13,6 @@ object Icon {
     val shopping_cart = R.drawable.shopping_cart
     val storage = R.drawable.storage
     val book = R.drawable.book
+    val visibility = R.drawable.visibility
+    val visibility_off = R.drawable.visibility_off
 }
