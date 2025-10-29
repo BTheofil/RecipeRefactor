@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -82,6 +84,7 @@ fun ShopScreen(
     var isDeleteDialogVisible by remember { mutableStateOf(false) }
     var isProductCreationVisible by remember { mutableStateOf(false) }
     var editedItem by remember { mutableStateOf<ShopItem?>(null) }
+    var isCheckedItemsVisible by remember { mutableStateOf(true) }
 
     val scope = rememberCoroutineScope()
 
@@ -149,33 +152,50 @@ fun ShopScreen(
                         }
                         if (state.checkedItems.isNotEmpty()) {
                             item {
+                                Spacer(Modifier.height(16.dp))
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    HorizontalDivider(
-                                        modifier = Modifier
-                                            .padding(horizontal = 32.dp),
-                                        thickness = 2.dp,
+                                    Text(
+                                        text = "Completed",
+                                        style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Icon(
+                                        modifier = Modifier
+                                            .clickable(
+                                                onClick = {
+                                                    isCheckedItemsVisible = !isCheckedItemsVisible
+                                                },
+                                                indication = null,
+                                                interactionSource = null,
+                                            ),
+                                        painter = painterResource(if (isCheckedItemsVisible) Icon.visibility else Icon.visibility_off),
+                                        contentDescription = "hide/show icon",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             }
-                            items(
-                                items = state.checkedItems,
-                                key = { it -> it.id ?: it.hashCode() }
-                            ) { item ->
-                                DisplayItemWidget(
-                                    modifier = Modifier.animateItem(),
-                                    item = item,
-                                    onCheckClick = { isChecked ->
-                                        onAction(
-                                            ShopAction.ShopItemChange(
-                                                item.copy(isChecked = isChecked)
+                            if (isCheckedItemsVisible) {
+                                items(
+                                    items = state.checkedItems,
+                                    key = { it -> it.id ?: it.hashCode() }
+                                ) { item ->
+                                    DisplayItemWidget(
+                                        modifier = Modifier.animateItem(),
+                                        item = item,
+                                        onCheckClick = { isChecked ->
+                                            onAction(
+                                                ShopAction.ShopItemChange(
+                                                    item.copy(isChecked = isChecked)
+                                                )
                                             )
-                                        )
-                                    },
-                                )
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
