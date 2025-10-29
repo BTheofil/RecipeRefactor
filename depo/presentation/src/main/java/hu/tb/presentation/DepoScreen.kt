@@ -25,8 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import hu.tb.core.domain.product.Measure
-import hu.tb.core.domain.product.Product
 import hu.tb.presentation.components.DisplayItemWithMenu
 import hu.tb.presentation.components.EmptyScreen
 import hu.tb.presentation.components.OutlineButtonPrimary
@@ -78,47 +76,53 @@ private fun DepoScreen(
                 .padding(16.dp)
         ) {
             if (state.products.isEmpty()) {
-                EmptyScreen()
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    items = state.products
-                ) { item ->
-                    DisplayItemWithMenu(
-                        modifier = Modifier.fillMaxWidth(),
-                        menuOptions = {
-                            IconButton(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .background(MaterialTheme.colorScheme.error),
-                                onClick = { action(DepoAction.DeleteProduct(item)) },
-                                content = {
-                                    Icon(painterResource(Icon.delete), "delete icon")
-                                }
-                            )
-                        },
-                        displayContent = {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
-                            ) {
-                                Text(
+                EmptyScreen(
+                    modifier = Modifier
+                        .weight(1f),
+                    text = "No products in storage",
+                    icon = Icon.storage
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = state.products
+                    ) { item ->
+                        DisplayItemWithMenu(
+                            modifier = Modifier.fillMaxWidth(),
+                            menuOptions = {
+                                IconButton(
                                     modifier = Modifier
-                                        .weight(1f),
-                                    text = item.name
+                                        .fillMaxHeight()
+                                        .background(MaterialTheme.colorScheme.error),
+                                    onClick = { action(DepoAction.DeleteProduct(item)) },
+                                    content = {
+                                        Icon(painterResource(Icon.delete), "delete icon")
+                                    }
                                 )
-                                Text(item.quantity.toString())
-                                Spacer(Modifier.width(4.dp))
-                                Text(item.measure.toDisplay)
+                            },
+                            displayContent = {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp)
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .weight(1f),
+                                        text = item.name
+                                    )
+                                    Text(item.quantity.toString())
+                                    Spacer(Modifier.width(4.dp))
+                                    Text(item.measure.toDisplay)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
             OutlineButtonPrimary(
@@ -134,8 +138,8 @@ private fun DepoScreen(
 private fun StorageScreenPreview() {
     val mockState = DepoState(
         products = listOf(
-            Product(name = "apple", quantity = 1.0, measure = Measure.PIECE),
-            Product(name = "potato", quantity = 2.0, measure = Measure.KG),
+            //Product(name = "apple", quantity = 1.0, measure = Measure.PIECE),
+            //Product(name = "potato", quantity = 2.0, measure = Measure.KG),
         )
     )
 
