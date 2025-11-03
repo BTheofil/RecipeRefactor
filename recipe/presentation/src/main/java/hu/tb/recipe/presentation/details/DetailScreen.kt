@@ -1,7 +1,10 @@
 package hu.tb.recipe.presentation.details
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -15,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -30,12 +32,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ import hu.tb.core.domain.recipe.details.Availability
 import hu.tb.core.domain.step.Step
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.presentation.theme.Icon
+import hu.tb.recipe.presentation.components.HoldingButton
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -90,7 +93,8 @@ private fun DetailScreen(
                 content = {
                     LazyColumn(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         itemsIndexed(
                             items = state.recipe.ingredients,
@@ -114,7 +118,7 @@ private fun DetailScreen(
                     ) {
                         itemsIndexed(
                             items = state.recipe.howToMakeSteps,
-                            key = { index, item -> item.id!! }
+                            key = { _, item -> item.id!! }
                         ) { index, step ->
                             NumberedStep(
                                 index = index + 1,
@@ -130,27 +134,54 @@ private fun DetailScreen(
                     .weight(1f),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    onClick = {
-                        makeRecipeClick()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    enabled = when {
-                        !state.isRecipeCookable && state.recipeIngredientsResult.isNotEmpty()-> false
-                        else -> true
-                    },
-                    content = {
-                        Text(
-                            text = if (state.recipeIngredientsResult.isEmpty()) "Check ingredients" else "Make recipe",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
+                var isCheckedIngredients by remember { mutableStateOf(false) }
+                AnimatedContent(
+                    targetState = isCheckedIngredients,
+                    transitionSpec = {
+                        fadeIn()
+                            .togetherWith(
+                                fadeOut()
+                            )
+                    }
+                ) { checkState ->
+                    if (checkState && state.isRecipeCookable) {
+                        HoldingButton(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onComplete = {
+                                makeRecipeClick()
+                                isCheckedIngredients = false
+                            },
+                            content = {
+                                Text(
+                                    text = "Hold to make this recipe",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            },
+                            coverColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        )
+                    } else {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onClick = {
+                                makeRecipeClick()
+                                isCheckedIngredients = true
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ),
+                            content = {
+                                Text(
+                                    text = "Check ingredients",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
                         )
                     }
-                )
+                }
             }
         }
     }
@@ -159,31 +190,61 @@ private fun DetailScreen(
 @Composable
 private fun IngredientItem(
     ingredient: Product,
-    availability: Availability,
+    availability: Availability?,
     calculatedDelay: Int = 0
 ) {
-    val iconVisibility by animateFloatAsState(
-        targetValue = when (availability) {
-            Availability.HAVE, Availability.LESS -> 1f
-            Availability.UNKNOWN -> 0f
-        },
-        animationSpec = tween(
-            durationMillis = CHECK_ANIMATION_DURATION_MILLIS,
-            delayMillis = calculatedDelay
-        )
-    )
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "- " + ingredient.name,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.secondary
-        )
+        AnimatedContent(
+            targetState = availability,
+            transitionSpec = {
+                fadeIn(tween(delayMillis = calculatedDelay)).togetherWith(fadeOut())
+            }
+        ) { state ->
+            val icon = when (state) {
+                Availability.HAVE -> Icon.check
+                Availability.LESS -> Icon.close
+                else -> null
+            }
+            if (icon != null) {
+                Icon(
+                    modifier = Modifier,
+                    painter = painterResource(icon),
+                    contentDescription = "availability icon",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        AnimatedContent(
+            targetState = availability,
+            transitionSpec = {
+                fadeIn(tween(delayMillis = calculatedDelay)).togetherWith(fadeOut())
+            }
+        ) { animatedAvailability ->
+            Column {
+                Text(
+                    text = ingredient.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                if (animatedAvailability != null && animatedAvailability != Availability.UNKNOWN) {
+                    Text(
+                        text = when (availability) {
+                            Availability.HAVE -> "Have enough"
+                            Availability.LESS -> "Less than needed"
+                            else -> ""
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
         Spacer(Modifier.weight(1f))
         Text(
             text = ingredient.quantity.toString(),
@@ -196,19 +257,6 @@ private fun IngredientItem(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.tertiary
         )
-        Spacer(Modifier.width(4.dp))
-
-        if (availability != Availability.UNKNOWN)
-            Icon(
-                modifier = Modifier
-                    .size(18.dp)
-                    .graphicsLayer {
-                        this.alpha = iconVisibility
-                    },
-                painter = painterResource(if (availability == Availability.HAVE) Icon.check_circle else Icon.close),
-                contentDescription = "check sign",
-                tint = MaterialTheme.colorScheme.primary
-            )
     }
 }
 
