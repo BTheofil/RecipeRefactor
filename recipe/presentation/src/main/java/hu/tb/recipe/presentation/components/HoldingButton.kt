@@ -86,6 +86,18 @@ fun HoldingButton(
                             onComplete()
                         }
                     }
+
+                    MotionEvent.ACTION_CANCEL -> {
+                        scope.launch {
+                            fractionAnim.animateTo(
+                                0f,
+                                animationSpec = tween(
+                                    durationMillis = TIME_RELEASE_PROGRESS,
+                                    easing = LinearEasing
+                                )
+                            )
+                        }
+                    }
                 }
                 true
             }
