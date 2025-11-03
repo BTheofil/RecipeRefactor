@@ -73,6 +73,7 @@ fun HoldingButton(
                     }
 
                     MotionEvent.ACTION_UP -> {
+                        val wasCompleted = fractionAnim.value == 1f
                         scope.launch {
                             fractionAnim.animateTo(
                                 0f,
@@ -82,7 +83,7 @@ fun HoldingButton(
                                 )
                             )
                         }
-                        if (fractionAnim.value == 1f) {
+                        if (wasCompleted) {
                             onComplete()
                         }
                     }
