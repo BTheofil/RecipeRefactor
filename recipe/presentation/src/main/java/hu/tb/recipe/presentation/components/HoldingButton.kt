@@ -109,7 +109,6 @@ fun HoldingButton(
                     )
                 )
             },
-            contentDescription = "on hold cover color"
         )
         Row(
             Modifier

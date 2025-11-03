@@ -225,14 +225,14 @@ private fun IngredientItem(
             transitionSpec = {
                 fadeIn(tween(delayMillis = calculatedDelay)).togetherWith(fadeOut())
             }
-        ) { isReviled ->
+        ) { animatedAvailability ->
             Column {
                 Text(
                     text = ingredient.name,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.secondary
                 )
-                if (isReviled != null && availability != Availability.UNKNOWN) {
+                if (animatedAvailability != null && animatedAvailability != Availability.UNKNOWN) {
                     Text(
                         text = when (availability) {
                             Availability.HAVE -> "Have enough"
