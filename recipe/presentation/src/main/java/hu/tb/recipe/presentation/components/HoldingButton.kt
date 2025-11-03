@@ -3,7 +3,9 @@ package hu.tb.recipe.presentation.components
 import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,21 +28,28 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.unit.dp
 import hu.tb.presentation.theme.AppTheme
 import kotlinx.coroutines.launch
 
+private const val MAX_TIME_TO_COMPLETE = 4000
+private const val TIME_RELEASE_PROGRESS = 2000
+
 @Composable
 fun HoldingButton(
-    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    onComplete: () -> Unit = {},
     content: @Composable RowScope.() -> Unit,
-    coverColor: Color = MaterialTheme.colorScheme.primary
+    coverColor: Color = MaterialTheme.colorScheme.secondary,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
+    borderStroke: BorderStroke = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
 ) {
     val fractionAnim = remember { Animatable(0f) }
     var componentSize by remember { mutableStateOf(IntSize.Zero) }
@@ -49,7 +58,7 @@ fun HoldingButton(
     val density = LocalDensity.current
 
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .pointerInteropFilter {
                 when (it.action) {
                     MotionEvent.ACTION_DOWN -> {
@@ -57,7 +66,7 @@ fun HoldingButton(
                             fractionAnim.animateTo(
                                 1f,
                                 animationSpec = tween(
-                                    durationMillis = 4000
+                                    durationMillis = (MAX_TIME_TO_COMPLETE * (1 - fractionAnim.value)).toInt()
                                 )
                             )
                         }
@@ -68,12 +77,13 @@ fun HoldingButton(
                             fractionAnim.animateTo(
                                 0f,
                                 animationSpec = tween(
-                                    durationMillis = 2000
+                                    durationMillis = TIME_RELEASE_PROGRESS,
+                                    easing = LinearEasing
                                 )
                             )
                         }
                         if (fractionAnim.value == 1f) {
-                            onClick()
+                            onComplete()
                         }
                     }
                 }
@@ -83,13 +93,21 @@ fun HoldingButton(
                 componentSize = it
             },
         shape = ButtonDefaults.shape,
+        contentColor = containerColor,
+        border = borderStroke
     ) {
         Canvas(
             modifier = Modifier
-                .height(with(density) { componentSize.height.toDp() })
-                .width(with(density) { fractionAnim.value * componentSize.width.toDp() }),
+                .width(with(density) { componentSize.width.toDp() })
+                .height(with(density) { componentSize.height.toDp() }),
             onDraw = {
-                drawRect(color = Color.Red)
+                drawRect(
+                    color = coverColor,
+                    size = Size(
+                        width = fractionAnim.value * size.width,
+                        height = size.height
+                    )
+                )
             },
             contentDescription = "on hold cover color"
         )
@@ -113,14 +131,14 @@ private fun HoldingButtonPreview() {
     AppTheme {
         Column {
             HoldingButton(
-                onClick = {
+                onComplete = {
                     Log.d("MYTAG", "click event")
                 },
                 content = {
                     Text(
                         text = "testing"
                     )
-                }
+                },
             )
             Button(
                 onClick = {}

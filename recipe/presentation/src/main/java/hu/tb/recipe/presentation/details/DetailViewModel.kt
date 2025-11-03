@@ -31,13 +31,12 @@ class DetailViewModel(
         }
     }
 
-    fun checkIngredientsAndMakeIt() {
-        if (state.value.recipeIngredientsResult.isEmpty()) {
-            checkProductAvailability()
-            return
+    fun checkIngredientsAndMakeIt() = with(state.value) {
+        when {
+            recipeIngredientsResult.isEmpty() -> checkProductAvailability()
+            recipeIngredientsResult.any { it.availability == Availability.LESS } -> Unit
+            else -> makeRecipeToProduct()
         }
-
-        makeRecipeToProduct()
     }
 
     private fun makeRecipeToProduct() {
