@@ -1,6 +1,7 @@
 package hu.tb.recipe.presentation.details
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -30,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +43,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import hu.tb.core.domain.product.Measure
 import hu.tb.core.domain.product.Product
 import hu.tb.core.domain.recipe.Recipe
@@ -49,17 +54,57 @@ import hu.tb.core.domain.recipe.details.Availability
 import hu.tb.core.domain.step.Step
 import hu.tb.presentation.theme.AppTheme
 import hu.tb.presentation.theme.Icon
+import hu.tb.recipe.presentation.components.CustomSnackbar
 import hu.tb.recipe.presentation.components.HoldingButton
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel = koinViewModel()
 ) {
+    var isRecipeAddedSnackbarVisible by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(viewModel.event, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.event.collect { event ->
+                if (event is DetailEvent.RecipeAddedToDepo) {
+                    isRecipeAddedSnackbarVisible = true
+                    delay(4.seconds)
+                    isRecipeAddedSnackbarVisible = false
+                }
+            }
+        }
+    }
+
     DetailScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
         makeRecipeClick = { viewModel.checkIngredientsAndMakeIt() }
     )
+
+    AnimatedVisibility(
+        visible = isRecipeAddedSnackbarVisible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 8.dp)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            viewModel.state.value.recipe?.let {
+                CustomSnackbar(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = it.name + " is added to your storage"
+                )
+            }
+        }
+    }
 }
 
 private const val CHECK_ANIMATION_DURATION_MILLIS = 400

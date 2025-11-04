@@ -10,8 +10,10 @@ import hu.tb.core.domain.recipe.Recipe
 import hu.tb.core.domain.recipe.RecipeRepository
 import hu.tb.core.domain.recipe.details.Availability
 import hu.tb.core.domain.recipe.details.IngredientAvailability
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -23,6 +25,9 @@ class DetailViewModel(
 
     private val _state = MutableStateFlow(DetailState())
     val state = _state.asStateFlow()
+
+    private val _event = Channel<DetailEvent>()
+    val event = _event.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -45,6 +50,7 @@ class DetailViewModel(
                 updateProductStockForRecipe(it)
                 insertOrUpdateFinalProduct(it.name)
                 resetRecipeCheck()
+                _event.send(DetailEvent.RecipeAddedToDepo)
             }
         }
     }
