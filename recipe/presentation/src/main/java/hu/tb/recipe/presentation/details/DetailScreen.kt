@@ -81,30 +81,9 @@ fun DetailScreen(
 
     DetailScreen(
         state = viewModel.state.collectAsStateWithLifecycle().value,
-        makeRecipeClick = { viewModel.checkIngredientsAndMakeIt() }
+        makeRecipeClick = { viewModel.checkIngredientsAndMakeIt() },
+        isSnackbarVisible = isRecipeAddedSnackbarVisible
     )
-
-    AnimatedVisibility(
-        visible = isRecipeAddedSnackbarVisible,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 8.dp)
-                .padding(horizontal = 16.dp),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            viewModel.state.value.recipe?.let {
-                CustomSnackbar(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = it.name + " is added to your storage"
-                )
-            }
-        }
-    }
 }
 
 private const val CHECK_ANIMATION_DURATION_MILLIS = 400
@@ -112,7 +91,8 @@ private const val CHECK_ANIMATION_DURATION_MILLIS = 400
 @Composable
 private fun DetailScreen(
     state: DetailState,
-    makeRecipeClick: () -> Unit
+    makeRecipeClick: () -> Unit,
+    isSnackbarVisible: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -227,6 +207,27 @@ private fun DetailScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+    AnimatedVisibility(
+        visible = isSnackbarVisible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 8.dp)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            state.recipe?.let {
+                CustomSnackbar(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = it.name + " is added to your storage"
+                )
             }
         }
     }
@@ -371,6 +372,10 @@ private fun DetailScreenPreview() {
     )
 
     AppTheme {
-        DetailScreen(state = DetailState(recipe = mockRecipe), makeRecipeClick = {})
+        DetailScreen(
+            state = DetailState(recipe = mockRecipe),
+            makeRecipeClick = {},
+            isSnackbarVisible = false
+        )
     }
 }
