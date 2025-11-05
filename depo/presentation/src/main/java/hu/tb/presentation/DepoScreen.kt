@@ -93,7 +93,8 @@ private fun DepoScreen(
                         items = state.products
                     ) { item ->
                         DisplayItemWithMenu(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .animateItem(),
                             menuOptions = {
                                 IconButton(
                                     modifier = Modifier

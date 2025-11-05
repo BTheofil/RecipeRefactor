@@ -8,4 +8,5 @@ interface ProductRepository {
     fun getAllFlow(): Flow<List<Product>>
     suspend fun getProductByNameAndMeasure(name: String, measure: Measure): Product?
     suspend fun getAllCurrent(): List<Product>
+    suspend fun getProductByName(name: String): List<Product>
 }
