@@ -7,7 +7,7 @@ import hu.tb.core.domain.product.Measure
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ProductDao: BaseDao<ProductEntity> {
+interface ProductDao : BaseDao<ProductEntity> {
 
     @Query("SELECT * FROM ProductEntity WHERE recipeIdConnection IS NULL AND isChecked IS NULL")
     suspend fun getAllCurrent(): List<ProductEntity>
@@ -15,9 +15,17 @@ interface ProductDao: BaseDao<ProductEntity> {
     @Query("SELECT * FROM ProductEntity WHERE recipeIdConnection IS NULL AND isChecked IS NULL")
     fun getAllFlow(): Flow<List<ProductEntity>>
 
-    @Query("SELECT * FROM ProductEntity " +
-            "WHERE recipeIdConnection IS NULL AND isChecked IS NULL " +
-            "AND name = :name AND measure =:measure"
+    @Query(
+        "SELECT * FROM ProductEntity " +
+                "WHERE recipeIdConnection IS NULL AND isChecked IS NULL " +
+                "AND name = :name AND measure =:measure"
     )
     suspend fun getProductByNameAndMeasure(name: String, measure: Measure): ProductEntity?
+
+    @Query(
+        "SELECT * FROM ProductEntity " +
+                "WHERE recipeIdConnection IS NULL AND isChecked IS NULL " +
+                "AND name = :name"
+    )
+    suspend fun getProductByName(name: String): List<ProductEntity>
 }

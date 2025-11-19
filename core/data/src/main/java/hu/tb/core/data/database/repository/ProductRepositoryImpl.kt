@@ -27,4 +27,7 @@ class ProductRepositoryImpl(
 
     override suspend fun getAllCurrent(): List<Product> =
         dao.getAllCurrent().map { it.toDomain() }
+
+    override suspend fun getProductByName(name: String): List<Product> =
+        dao.getProductByName(name).map { it.toDomain() }
 }
