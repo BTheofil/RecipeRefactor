@@ -75,7 +75,6 @@ fun CustomSnackbar(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(snackbarShape)
                 .padding(bottom = 2.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
