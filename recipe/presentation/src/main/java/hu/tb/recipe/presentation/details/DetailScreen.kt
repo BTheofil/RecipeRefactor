@@ -2,9 +2,13 @@ package hu.tb.recipe.presentation.details
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -32,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,7 +78,7 @@ fun DetailScreen(
             viewModel.event.collect { event ->
                 if (event is DetailEvent.RecipeAddedToDepo) {
                     isRecipeAddedSnackbarVisible = true
-                    delay(4.seconds)
+                    delay(SnackbarVisibleTime)
                     isRecipeAddedSnackbarVisible = false
                 }
             }
@@ -86,6 +92,7 @@ fun DetailScreen(
     )
 }
 
+private val SnackbarVisibleTime = 4.seconds
 private const val CHECK_ANIMATION_DURATION_MILLIS = 400
 
 @Composable
@@ -153,80 +160,124 @@ private fun DetailScreen(
                     }
                 }
             )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                var isCheckedIngredients by remember { mutableStateOf(false) }
-                AnimatedContent(
-                    targetState = isCheckedIngredients,
-                    transitionSpec = {
-                        fadeIn()
-                            .togetherWith(
-                                fadeOut()
-                            )
-                    }
-                ) { checkState ->
-                    if (checkState && state.isRecipeCookable) {
-                        HoldingButton(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            onComplete = {
-                                makeRecipeClick()
-                                isCheckedIngredients = false
-                            },
-                            content = {
-                                Text(
-                                    text = "Hold to make this recipe",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            },
-                            coverColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+            Spacer(modifier = Modifier.weight(1f))
+            IngredientCheckButton(
+                isRecipeCookable = state.isRecipeCookable,
+                isCheckButtonEnabled = !isSnackbarVisible,
+                onButtonClick = { makeRecipeClick() }
+            )
+        }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Spacer(Modifier.weight(1f))
+        Snackbar(
+            isSnackbarVisible = isSnackbarVisible,
+            recipeName = state.recipe?.name
+        )
+    }
+}
+
+@Composable
+private fun IngredientCheckButton(
+    modifier: Modifier = Modifier,
+    isRecipeCookable: Boolean,
+    isCheckButtonEnabled: Boolean,
+    onButtonClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        var isCheckedIngredients by remember { mutableStateOf(false) }
+        AnimatedContent(
+            targetState = isCheckedIngredients,
+            transitionSpec = {
+                fadeIn()
+                    .togetherWith(
+                        fadeOut()
+                    )
+            }
+        ) { checkState ->
+            if (checkState && isRecipeCookable) {
+                HoldingButton(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onComplete = {
+                        onButtonClick()
+                        isCheckedIngredients = false
+                    },
+                    content = {
+                        Text(
+                            text = "Hold to make this recipe",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                    } else {
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            onClick = {
-                                makeRecipeClick()
-                                isCheckedIngredients = true
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            ),
-                            content = {
-                                Text(
-                                    text = "Check ingredients",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                            }
+                    },
+                    coverColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                )
+            } else {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = {
+                        onButtonClick()
+                        isCheckedIngredients = true
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    enabled = isCheckButtonEnabled,
+                    content = {
+                        Text(
+                            text = "Check ingredients",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                }
+                )
             }
         }
     }
+}
+
+@Composable
+private fun Snackbar(
+    isSnackbarVisible: Boolean,
+    recipeName: String?
+) {
     AnimatedVisibility(
+        modifier = Modifier
+            .zIndex(1f),
         visible = isSnackbarVisible,
-        enter = fadeIn(),
-        exit = fadeOut()
+        enter = fadeIn() + slideInVertically(
+            initialOffsetY = { it / 2 },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        ),
+        exit = fadeOut() + slideOutVertically(
+            targetOffsetY = { it },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 8.dp)
-                .padding(horizontal = 16.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
-            state.recipe?.let {
+            recipeName?.let {
                 CustomSnackbar(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    text = it.name + " is added to your storage"
+                    text = "$it is added to your storage",
+                    progressDuration = SnackbarVisibleTime
                 )
             }
         }
@@ -312,12 +363,13 @@ private fun NumberedStep(
     description: String,
 ) {
     var stepLineCount by remember { mutableIntStateOf(-1) }
+    val isSingleLine by remember { derivedStateOf { stepLineCount == 1 } }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalAlignment = if (stepLineCount == 1) Alignment.CenterVertically else Alignment.Top,
+        verticalAlignment = if (isSingleLine) Alignment.CenterVertically else Alignment.Top,
     ) {
         Text(
             text = "$index.",
