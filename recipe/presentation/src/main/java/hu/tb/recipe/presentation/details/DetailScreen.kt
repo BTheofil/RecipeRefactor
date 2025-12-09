@@ -2,6 +2,8 @@ package hu.tb.recipe.presentation.details
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -46,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -157,19 +160,25 @@ private fun DetailScreen(
                     }
                 }
             )
+            Spacer(modifier = Modifier.weight(1f))
             IngredientCheckButton(
-                modifier = Modifier
-                    .weight(1f),
                 isRecipeCookable = state.isRecipeCookable,
                 isCheckButtonEnabled = !isSnackbarVisible,
                 onButtonClick = { makeRecipeClick() }
             )
         }
     }
-    Snackbar(
-        isSnackbarVisible = isSnackbarVisible,
-        recipeName = state.recipe?.name
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Spacer(Modifier.weight(1f))
+        Snackbar(
+            isSnackbarVisible = isSnackbarVisible,
+            recipeName = state.recipe?.name
+        )
+    }
 }
 
 @Composable
@@ -242,15 +251,25 @@ private fun Snackbar(
     recipeName: String?
 ) {
     AnimatedVisibility(
+        modifier = Modifier
+            .zIndex(1f),
         visible = isSnackbarVisible,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
-        exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
+        enter = fadeIn() + slideInVertically(
+            initialOffsetY = { it / 2 },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        ),
+        exit = fadeOut() + slideOutVertically(
+            targetOffsetY = { it },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 8.dp)
-                .padding(horizontal = 16.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             recipeName?.let {

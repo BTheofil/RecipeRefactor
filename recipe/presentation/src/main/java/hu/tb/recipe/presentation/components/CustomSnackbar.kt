@@ -1,11 +1,15 @@
 package hu.tb.recipe.presentation.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
@@ -37,7 +41,8 @@ fun CustomSnackbar(
         progressAnimation.animateTo(
             targetValue = 1f,
             animationSpec = tween(
-                durationMillis = progressDuration.toInt(DurationUnit.MILLISECONDS)
+                durationMillis = progressDuration.toInt(DurationUnit.MILLISECONDS),
+                easing = LinearEasing
             )
         )
     }
@@ -51,32 +56,39 @@ fun CustomSnackbar(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.primary,
                 shape = snackbarShape
-            ),
-        contentAlignment = Alignment.Center
+            )
+            .height(IntrinsicSize.Min)
     ) {
-        Text(
+        Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(16.dp),
-            text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Start
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(snackbarShape)
+                .padding(bottom = 2.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                color = MaterialTheme.colorScheme.primary,
+                progress = { progressAnimation.value }
+            )
+        }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(snackbarShape)
-            .padding(top = 2.dp),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        LinearProgressIndicator(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            color = MaterialTheme.colorScheme.primary,
-            progress = { progressAnimation.value }
-        )
-    }
+
 }
 
 private val snackbarShape = RoundedCornerShape(16.dp)
