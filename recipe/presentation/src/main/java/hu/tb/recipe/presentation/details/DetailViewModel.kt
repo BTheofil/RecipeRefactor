@@ -11,11 +11,13 @@ import hu.tb.core.domain.recipe.RecipeRepository
 import hu.tb.core.domain.recipe.details.Availability
 import hu.tb.core.domain.recipe.details.IngredientAvailability
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 class DetailViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -95,6 +97,8 @@ class DetailViewModel(
     private fun checkProductAvailability() {
         state.value.recipe?.let { recipe ->
             viewModelScope.launch {
+                _state.update { it.copy(isChecking = true) }
+
                 val updatedList = recipe.ingredients.map { ingredient ->
                     val availability = calculateAvailability(ingredient)
                     IngredientAvailability(ingredient, availability)
@@ -102,10 +106,12 @@ class DetailViewModel(
 
                 val allEnough = updatedList.none { it.availability == Availability.LESS }
 
+                delay(1.seconds)
                 _state.update {
                     it.copy(
                         recipeIngredientsResult = updatedList,
-                        isRecipeCookable = allEnough
+                        isRecipeCookable = allEnough,
+                        isChecking = false
                     )
                 }
             }

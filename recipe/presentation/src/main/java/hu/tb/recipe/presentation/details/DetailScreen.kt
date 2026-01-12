@@ -11,8 +11,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,11 +21,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -106,7 +104,7 @@ private fun DetailScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
-            .scrollable(rememberScrollState(), Orientation.Horizontal)
+            .verticalScroll(rememberScrollState())
     ) {
         if (state.recipe == null) {
             CircularProgressIndicator()
@@ -123,21 +121,29 @@ private fun DetailScreen(
             Spacer(Modifier.height(16.dp))
             SectionBackground(
                 content = {
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
                     ) {
-                        itemsIndexed(
-                            items = state.recipe.ingredients,
-                            key = { _, item -> item.id!! }
-                        ) { index, ingredient ->
-                            IngredientItem(
-                                ingredient = ingredient,
-                                availability = state.recipeIngredientsResult.find { it.product == ingredient }?.availability
-                                    ?: Availability.UNKNOWN,
-                                calculatedDelay = CHECK_ANIMATION_DURATION_MILLIS * index
-                            )
+                        Text(
+                            text = "Ingredients",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            state.recipe.ingredients.forEachIndexed { index, ingredient ->
+                                IngredientItem(
+                                    ingredient = ingredient,
+                                    availability = state.recipeIngredientsResult.find { it.product == ingredient }?.availability
+                                        ?: Availability.INIT,
+                                    calculatedDelay = CHECK_ANIMATION_DURATION_MILLIS * index,
+                                    isChecking = state.isChecking
+                                )
+                            }
                         }
                     }
                 }
@@ -145,17 +151,26 @@ private fun DetailScreen(
             Spacer(Modifier.height(12.dp))
             SectionBackground(
                 content = {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
                     ) {
-                        itemsIndexed(
-                            items = state.recipe.howToMakeSteps,
-                            key = { _, item -> item.id!! }
-                        ) { index, step ->
-                            NumberedStep(
-                                index = index + 1,
-                                description = step.description
-                            )
+                        Text(
+                            text = "How to",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            state.recipe.howToMakeSteps.forEachIndexed { index, step ->
+                                NumberedStep(
+                                    index = index + 1,
+                                    description = step.description
+                                )
+                            }
                         }
                     }
                 }
@@ -287,33 +302,38 @@ private fun Snackbar(
 @Composable
 private fun IngredientItem(
     ingredient: Product,
-    availability: Availability?,
-    calculatedDelay: Int = 0
+    availability: Availability,
+    calculatedDelay: Int = 0,
+    isChecking: Boolean
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AnimatedContent(
-            targetState = availability,
-            transitionSpec = {
-                fadeIn(tween(delayMillis = calculatedDelay)).togetherWith(fadeOut())
-            }
-        ) { state ->
-            val icon = when (state) {
-                Availability.HAVE -> Icon.check
-                Availability.LESS -> Icon.close
-                else -> null
-            }
-            if (icon != null) {
-                Icon(
-                    modifier = Modifier,
-                    painter = painterResource(icon),
-                    contentDescription = "availability icon",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+        if (isChecking) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+        } else {
+            AnimatedContent(
+                targetState = availability,
+                transitionSpec = {
+                    fadeIn(tween(delayMillis = calculatedDelay)).togetherWith(fadeOut())
+                }
+            ) { state ->
+                val icon = when (state) {
+                    Availability.HAVE -> Icon.check
+                    Availability.LESS -> Icon.close
+                    Availability.UNKNOWN -> Icon.question_mark
+                    Availability.INIT -> null
+                }
+                icon?.let {
+                    Icon(
+                        modifier = Modifier,
+                        painter = painterResource(it),
+                        contentDescription = "availability icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                } ?: Spacer(Modifier.width(24.dp))
             }
         }
         Spacer(Modifier.width(12.dp))
@@ -329,11 +349,12 @@ private fun IngredientItem(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.secondary
                 )
-                if (animatedAvailability != null && animatedAvailability != Availability.UNKNOWN) {
+                if (animatedAvailability != Availability.INIT) {
                     Text(
                         text = when (availability) {
                             Availability.HAVE -> "Have enough"
                             Availability.LESS -> "Less than needed"
+                            Availability.UNKNOWN -> "Not recorded"
                             else -> ""
                         },
                         style = MaterialTheme.typography.labelMedium,
@@ -367,8 +388,7 @@ private fun NumberedStep(
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .fillMaxWidth(),
         verticalAlignment = if (isSingleLine) Alignment.CenterVertically else Alignment.Top,
     ) {
         Text(
@@ -420,12 +440,12 @@ private fun DetailScreenPreview() {
         howToMakeSteps = listOf(
             Step(id = 1, description = "cut"),
             Step(id = 2, description = "bake")
-        )
+        ),
     )
 
     AppTheme {
         DetailScreen(
-            state = DetailState(recipe = mockRecipe),
+            state = DetailState(recipe = mockRecipe, isChecking = true),
             makeRecipeClick = {},
             isSnackbarVisible = false
         )

@@ -4,9 +4,9 @@ import hu.tb.core.domain.product.Product
 
 data class IngredientAvailability(
     val product: Product,
-    val availability: Availability = Availability.UNKNOWN
+    val availability: Availability = Availability.INIT
 )
 
 enum class Availability {
-    HAVE, LESS, UNKNOWN
+    INIT, HAVE, LESS, UNKNOWN
 }

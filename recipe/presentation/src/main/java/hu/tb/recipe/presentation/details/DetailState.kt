@@ -6,5 +6,6 @@ import hu.tb.core.domain.recipe.details.IngredientAvailability
 data class DetailState(
     val recipe: Recipe? = null,
     val recipeIngredientsResult: List<IngredientAvailability> = emptyList(),
-    val isRecipeCookable: Boolean = false
+    val isRecipeCookable: Boolean = false,
+    val isChecking: Boolean = false
 )
