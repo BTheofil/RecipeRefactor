@@ -1,6 +1,4 @@
 import com.android.build.api.dsl.ApplicationExtension
-import hu.tb.convention.ExtensionType
-import hu.tb.convention.configureBuildTypes
 import hu.tb.convention.configureKotlinAndroid
 import hu.tb.convention.libs
 import org.gradle.api.Plugin
@@ -12,7 +10,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "com.android.application")
-            apply(plugin = "org.jetbrains.kotlin.android")
 
             extensions.configure<ApplicationExtension> {
                 defaultConfig {
@@ -24,7 +21,21 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 configureKotlinAndroid(this)
-                configureBuildTypes(this, ExtensionType.APPLICATION)
+
+                buildFeatures {
+                    buildConfig = true
+                }
+
+                buildTypes {
+                    debug {}
+                    release {
+                        isMinifyEnabled = true
+                        proguardFiles(
+                            this@configure.getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "proguard-rules.pro"
+                        )
+                    }
+                }
             }
         }
     }

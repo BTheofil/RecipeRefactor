@@ -1,6 +1,4 @@
 import com.android.build.api.dsl.LibraryExtension
-import hu.tb.convention.ExtensionType
-import hu.tb.convention.configureBuildTypes
 import hu.tb.convention.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,16 +11,25 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.run {
                 apply("com.android.library")
-                apply("org.jetbrains.kotlin.android")
             }
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
 
-                configureBuildTypes(
-                    commonExtension = this,
-                    extensionType = ExtensionType.LIBRARY
-                )
+                buildFeatures {
+                    buildConfig = true
+                }
+
+                buildTypes {
+                    debug {}
+                    release {
+                        isMinifyEnabled = true
+                        proguardFiles(
+                            this@configure.getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "proguard-rules.pro"
+                        )
+                    }
+                }
 
                 defaultConfig {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
