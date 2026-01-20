@@ -21,21 +21,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 configureKotlinAndroid(this)
-
-                buildFeatures {
-                    buildConfig = true
-                }
-
-                buildTypes {
-                    debug {}
-                    release {
-                        isMinifyEnabled = true
-                        proguardFiles(
-                            this@configure.getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
             }
         }
     }

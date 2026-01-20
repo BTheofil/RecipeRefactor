@@ -16,21 +16,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
 
-                buildFeatures {
-                    buildConfig = true
-                }
-
-                buildTypes {
-                    debug {}
-                    release {
-                        isMinifyEnabled = true
-                        proguardFiles(
-                            this@configure.getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
-
                 defaultConfig {
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                     consumerProguardFiles("consumer-rules.pro")
